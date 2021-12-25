@@ -33,7 +33,7 @@ public class ServerPlayerMixin {
 
 	@Inject(
 			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;unRide()V"
+					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"
 			), method = "changeDimension"
 	)
 	private void companion_returnFromEnd(ServerLevel to, CallbackInfoReturnable<Entity> cir) {
