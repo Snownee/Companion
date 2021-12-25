@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "snownee.companion.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "refmap": "companion.refmap.json",
+  "mixins": [
+    "PlayerMixin",
+    "EntityMixin",
+    "ServerPlayerMixin",
+    "OwnerHurtTargetGoalMixin",
+    "OwnerHurtByTargetGoalMixin",
+    "TargetGoalMixin",
+    "LivingEntityMixin",
+    "TamableAnimalMixin",
+    "PersistentEntitySectionManagerMixin",
+    "FollowOwnerGoalMixin",
+    "EntityAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
