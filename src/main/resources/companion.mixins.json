@@ -14,7 +14,8 @@
     "TamableAnimalMixin",
     "PersistentEntitySectionManagerMixin",
     "FollowOwnerGoalMixin",
-    "EntityAccessor"
+    "EntityAccessor",
+    "ItemTagsAccessor"
   ],
   "client": [
   ],

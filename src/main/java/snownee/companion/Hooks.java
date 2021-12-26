@@ -10,22 +10,30 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import snownee.companion.mixin.EntityAccessor;
+import snownee.companion.mixin.ItemTagsAccessor;
 
 public class Hooks {
 
 	public static boolean traveling;
+	public static final Named<Item> RANGED_WEAPON = ItemTagsAccessor.callBind("companion:ranged_weapon");
+	public static final Named<Item> CHARGED_RANGED_WEAPON = ItemTagsAccessor.callBind("companion:charged_ranged_weapon");
 
 	// Here is a bug that tamed wolf reset their health when it travel through portal.
 	// Good job mojang
@@ -137,7 +145,10 @@ public class Hooks {
 	}
 
 	public static boolean wantsToAttack0(TamableAnimal pet, LivingEntity enemy) {
-		return CompanionCommonConfig.petWontAttackWhenInjured && !((enemy instanceof Enemy || enemy instanceof IronGolem) && isInjured(pet));
+		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
+			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
+		}
+		return true;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -167,6 +178,29 @@ public class Hooks {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
+		if (player.isHolding($ -> $.is(RANGED_WEAPON))) {
+			ItemStack main = player.getMainHandItem();
+			ItemStack off = player.getOffhandItem();
+			ItemStack stack = main.is(RANGED_WEAPON) ? main : off;
+			if (stack.getItem() instanceof CrossbowItem) {
+				if (CrossbowItem.isCharged(stack)) {
+					return true;
+				}
+			} else {
+				return true;
+			}
+		}
+		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 && player.isHolding($ -> $.is(CHARGED_RANGED_WEAPON))) {
+			ItemStack stack = player.getUseItem();
+			UseAnim anim = stack.getUseAnimation();
+			if (anim == UseAnim.BOW || anim == UseAnim.CROSSBOW || anim == UseAnim.SPEAR) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
