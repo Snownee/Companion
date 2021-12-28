@@ -46,4 +46,7 @@ public final class CompanionCommonConfig {
 	@Path("injuredStatus.teleportToOwner")
 	public static boolean petTeleportToOwnerWhenInjured = true;
 
+	@Path("combat.betterSweepingEdgeEffect")
+	public static boolean betterSweepingEdgeEffect = true;
+
 }
