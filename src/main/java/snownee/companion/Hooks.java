@@ -222,4 +222,14 @@ public class Hooks {
 		return entity.level.getPlayerByUUID(ownerUUID);
 	}
 
+	public static boolean hasOwner(Entity entity) {
+		if (entity instanceof OwnableEntity) {
+			return ((OwnableEntity) entity).getOwnerUUID() != null;
+		}
+		if (entity instanceof AbstractHorse) {
+			return ((AbstractHorse) entity).getOwnerUUID() != null;
+		}
+		return false;
+	}
+
 }
