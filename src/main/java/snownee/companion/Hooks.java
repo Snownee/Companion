@@ -90,8 +90,10 @@ public class Hooks {
 			}
 			if (entity instanceof Mob) {
 				Mob mob = (Mob) entity;
-				if (mob.isLeashed() && mob.getLeashHolder() == player) {
-					entities.add(mob);
+				if (mob.isLeashed()) {
+					if (mob.getLeashHolder() == player) {
+						entities.add(mob);
+					}
 					continue;
 				}
 			}
