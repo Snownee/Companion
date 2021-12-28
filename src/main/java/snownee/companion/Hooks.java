@@ -3,6 +3,7 @@ package snownee.companion;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 import com.google.common.collect.Lists;
 
@@ -14,9 +15,12 @@ import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -175,7 +179,7 @@ public class Hooks {
 		if (pet.isLeashed() || pet.isOrderedToSit() || pet.isPassenger()) {
 			return false;
 		}
-		LivingEntity owner = ((TamableAnimal) pet).getOwner();
+		LivingEntity owner = pet.getOwner();
 		if (owner == null || owner.isDeadOrDying() || owner.isSpectator()) {
 			return false;
 		}
@@ -203,6 +207,19 @@ public class Hooks {
 			}
 		}
 		return false;
+	}
+
+	public static Player getEntityOwner(Entity entity) {
+		UUID ownerUUID = null;
+		if (entity instanceof OwnableEntity) {
+			ownerUUID = ((OwnableEntity) entity).getOwnerUUID();
+		} else if (entity instanceof AbstractHorse) {
+			ownerUUID = ((AbstractHorse) entity).getOwnerUUID();
+		}
+		if (ownerUUID == null) {
+			return null;
+		}
+		return entity.level.getPlayerByUUID(ownerUUID);
 	}
 
 }

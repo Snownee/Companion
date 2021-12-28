@@ -1,6 +1,6 @@
 package snownee.companion.mixin;
 
-import java.util.UUID;
+import java.util.Objects;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,8 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.OwnableEntity;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -50,20 +48,20 @@ public class EntityMixin {
 			return;
 		}
 		Entity entity = (Entity) (Object) this;
-		UUID ownerUUID;
-		if (entity instanceof OwnableEntity) {
-			ownerUUID = ((OwnableEntity) entity).getOwnerUUID();
-		} else if (entity instanceof AbstractHorse) {
-			ownerUUID = ((AbstractHorse) entity).getOwnerUUID();
-		} else {
-			return;
-		}
-		if (ownerUUID == null) {
-			return;
-		}
-		Player owner = entity.level.getPlayerByUUID(ownerUUID);
+		Player owner = Hooks.getEntityOwner(entity);
 		if (owner == null || owner.distanceToSqr(entity) > r * r) {
 			ci.setReturnValue(false);
+		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "isAlliedTo(Lnet/minecraft/world/entity/Entity;)Z", cancellable = true)
+	private void companion_isAlliedTo(Entity entity, CallbackInfoReturnable<Boolean> ci) {
+		if (CompanionCommonConfig.betterSweepingEdgeEffect && (Object) this instanceof Player) {
+			Player owner = Hooks.getEntityOwner(entity);
+			Player self = (Player) (Object) this;
+			if (Objects.equals(self, owner)) {
+				ci.setReturnValue(true);
+			}
 		}
 	}
 
