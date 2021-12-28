@@ -48,9 +48,11 @@ public class EntityMixin {
 			return;
 		}
 		Entity entity = (Entity) (Object) this;
-		Player owner = Hooks.getEntityOwner(entity);
-		if (owner == null || owner.distanceToSqr(entity) > r * r) {
-			ci.setReturnValue(false);
+		if (Hooks.hasOwner(entity)) {
+			Player owner = Hooks.getEntityOwner(entity);
+			if (owner == null || owner.distanceToSqr(entity) > r * r) {
+				ci.setReturnValue(false);
+			}
 		}
 	}
 
