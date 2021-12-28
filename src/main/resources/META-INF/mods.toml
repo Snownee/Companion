@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[38,)"
+license="ARR"
+
+[[mods]]
+modId="companion"
+version="${file.jarVersion}"
+displayName="Companion"
+authors="Snownee"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/companion"
+description="Protect your pets."
+
+[[dependencies.companion]]
+    modId="forge"
+    mandatory=true
+    versionRange="[38.0.14,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.companion]]
+    modId="kiwi"
+    mandatory=true
+    versionRange="[5.1.0,)"
+    ordering="NONE"
+    side="BOTH"
+
+[modproperties.companion]
+    catalogueItemIcon="bone" #Support for Catalogue mod
