@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -14,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionPlayer;
 
-@Mixin(Player.class)
+@Mixin(value = Player.class, priority = 1050)
 public abstract class PlayerMixin implements CompanionPlayer {
 
 	@Inject(at = @At("TAIL"), method = "aiStep")
@@ -51,15 +50,6 @@ public abstract class PlayerMixin implements CompanionPlayer {
 		if (f > CompanionCommonConfig.shoulderDismountDamageThreshold) {
 			removeEntitiesOnShoulder();
 		}
-	}
-
-	@Redirect(
-			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;removeEntitiesOnShoulder()V"
-			), method = { "aiStep", "hurt" }
-	)
-	protected void nullifyDefaultRemoveEntitiesOnShoulder(Player player) {
-		// NOOP
 	}
 
 	@Shadow

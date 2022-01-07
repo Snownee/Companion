@@ -5,6 +5,7 @@
   "refmap": "companion.refmap.json",
   "mixins": [
     "PlayerMixin",
+    "PlayerMixinOptional",
     "EntityMixin",
     "ServerPlayerMixin",
     "OwnerHurtTargetGoalMixin",
