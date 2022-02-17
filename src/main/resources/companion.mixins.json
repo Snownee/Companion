@@ -16,7 +16,8 @@
     "PersistentEntitySectionManagerMixin",
     "FollowOwnerGoalMixin",
     "EntityAccessor",
-    "ItemTagsAccessor"
+    "ItemTagsAccessor",
+    "ItemMixin"
   ],
   "client": [
   ],
