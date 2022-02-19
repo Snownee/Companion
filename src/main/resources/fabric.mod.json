@@ -15,6 +15,9 @@
   "license": "ARR",
 
   "entrypoints": {
+    "main": [
+      "snownee.companion.Companion"
+    ]
   },
   "mixins": [ "companion.mixins.json" ],
 

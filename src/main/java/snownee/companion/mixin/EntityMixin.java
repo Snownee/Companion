@@ -10,10 +10,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionPlayer;
 import snownee.companion.Hooks;
@@ -62,6 +64,16 @@ public class EntityMixin {
 			Player owner = Hooks.getEntityOwner(entity);
 			Player self = (Player) (Object) this;
 			if (Objects.equals(self, owner)) {
+				ci.setReturnValue(true);
+			}
+		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
+	private void companion_isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
+		Entity self = (Entity) (Object) this;
+		if (!damageSource.isExplosion() && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
+			if (!self.level.getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.setReturnValue(true);
 			}
 		}

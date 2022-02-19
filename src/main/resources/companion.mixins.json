@@ -4,21 +4,20 @@
   "compatibilityLevel": "JAVA_16",
   "refmap": "companion.refmap.json",
   "mixins": [
-    "PlayerMixin",
-    "PlayerMixinOptional",
+    "EntityAccess",
     "EntityMixin",
-    "ServerPlayerMixin",
-    "OwnerHurtTargetGoalMixin",
-    "OwnerHurtByTargetGoalMixin",
-    "TargetGoalMixin",
-    "LivingEntityMixin",
-    "TamableAnimalMixin",
-    "PersistentEntitySectionManagerMixin",
     "FollowOwnerGoalMixin",
-    "EntityAccessor",
-    "ItemTagsAccessor"
-  ],
-  "client": [
+    "ItemMixin",
+    "LivingEntityMixin",
+    "MobAccess",
+    "OwnerHurtByTargetGoalMixin",
+    "OwnerHurtTargetGoalMixin",
+    "PersistentEntitySectionManagerMixin",
+    "PlayerMixin",
+    "PlayerMixinFailsafe",
+    "ServerPlayerMixin",
+    "TamableAnimalMixin",
+    "TargetGoalMixin"
   ],
   "injectors": {
     "defaultRequire": 1
