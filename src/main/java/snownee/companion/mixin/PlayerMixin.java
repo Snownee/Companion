@@ -8,10 +8,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionPlayer;
+import snownee.companion.Hooks;
 
 @Mixin(value = Player.class, priority = 1050)
 public abstract class PlayerMixin implements CompanionPlayer {
@@ -75,6 +78,16 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	@Inject(at = @At("HEAD"), method = "jumpFromGround")
 	private void companion_jumpFromGround(CallbackInfo ci) {
 		jumpPos = ((Player) (Object) this).position();
+	}
+
+	@Inject(at = @At("HEAD"), method = "attack", cancellable = true)
+	private void companion_attack(Entity entity, CallbackInfo ci) {
+		if (Hooks.getEntityOwner(entity) == (Object) this) {
+			Player self = (Player) (Object) this;
+			if (!self.level.getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
+				ci.cancel();
+			}
+		}
 	}
 
 }

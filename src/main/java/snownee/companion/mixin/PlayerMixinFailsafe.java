@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import snownee.companion.CompanionPlayer;
 
 @Mixin(value = Player.class, priority = 950)
-public abstract class PlayerMixinOptional implements CompanionPlayer {
+public abstract class PlayerMixinFailsafe implements CompanionPlayer {
 
 	@Redirect(
 			at = @At(

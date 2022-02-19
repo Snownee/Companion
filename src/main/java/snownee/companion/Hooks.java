@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag.Named;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,20 +32,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
-import snownee.companion.mixin.EntityAccessor;
-import snownee.companion.mixin.ItemTagsAccessor;
+import snownee.companion.mixin.EntityAccess;
 
 public class Hooks {
 
 	public static boolean traveling;
-	public static final Named<Item> RANGED_WEAPON = ItemTagsAccessor.callBind("companion:ranged_weapon");
-	public static final Named<Item> CHARGED_RANGED_WEAPON = ItemTagsAccessor.callBind("companion:charged_ranged_weapon");
+	public static final Named<Item> RANGED_WEAPON = ItemTags.bind("companion:ranged_weapon");
+	public static final Named<Item> CHARGED_RANGED_WEAPON = ItemTags.bind("companion:charged_ranged_weapon");
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 
-	// Here is a bug that tamed wolf reset their health when it travel through portal.
+	// Here is a bug that tamed wolf reset their health when it travels through portal.
 	// Good job mojang
 	public static void changeDimension(ServerPlayer player, ServerLevel to, ServerLevel from, boolean returnFromEnd) {
 		if (player.isSpectator() || player.isDeadOrDying()) {
@@ -62,15 +61,15 @@ public class Hooks {
 		boolean nether = from.dimension() == Level.NETHER || to.dimension() == Level.NETHER;
 		BlockPos portalPos = null;
 		if (nether) {
-			portalPos = ((EntityAccessor) player).getPortalEntrancePos();
+			portalPos = ((EntityAccess) player).getPortalEntrancePos();
 			if (portalPos == null) {
 				return;
 			}
 		}
 		for (LivingEntity entity : getAllPets(from, player)) {
 			if (nether) {
-				((EntityAccessor) entity).setPortalCooldown(0);
-				((EntityAccessor) entity).callHandleInsidePortal(portalPos);
+				((EntityAccess) entity).setPortalCooldown(0);
+				((EntityAccess) entity).callHandleInsidePortal(portalPos);
 			}
 			entity.setPortalCooldown();
 			entity = (LivingEntity) entity.changeDimension(to);
@@ -166,8 +165,8 @@ public class Hooks {
 		return entity.getHealth() / entity.getMaxHealth() <= CompanionCommonConfig.petInjuredStatusHealthRatio;
 	}
 
-	public static void handleChunkPreUnload(List<EntityAccess> entities) {
-		for (EntityAccess entity : entities) {
+	public static void handleChunkPreUnload(List<net.minecraft.world.level.entity.EntityAccess> entities) {
+		for (net.minecraft.world.level.entity.EntityAccess entity : entities) {
 			if (entity instanceof TamableAnimal) {
 				TamableAnimal pet = (TamableAnimal) entity;
 				if (shouldFollowOwner(pet)) {

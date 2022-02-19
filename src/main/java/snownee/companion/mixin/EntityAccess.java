@@ -8,7 +8,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 
 @Mixin(Entity.class)
-public interface EntityAccessor {
+public interface EntityAccess {
 
 	@Accessor
 	BlockPos getPortalEntrancePos();
