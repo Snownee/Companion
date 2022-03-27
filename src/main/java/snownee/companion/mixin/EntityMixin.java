@@ -72,7 +72,7 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
 	private void companion_isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
 		Entity self = (Entity) (Object) this;
-		if (!damageSource.isExplosion() && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
+		if (!damageSource.isExplosion() && damageSource.getEntity() != null && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
 			if (!self.level.getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.setReturnValue(true);
 			}
