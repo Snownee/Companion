@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
+import com.github.alexthe666.alexsmobs.entity.IFollower;
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
@@ -35,11 +36,13 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
+import net.minecraftforge.fml.ModList;
 import snownee.companion.mixin.EntityAccess;
 
 public class Hooks {
 
 	public static boolean traveling;
+	public static boolean alexsMobs = ModList.get().isLoaded("alexsmobs");
 	public static final TagKey<Item> RANGED_WEAPON = ItemTags.create(new ResourceLocation(Companion.ID, "ranged_weapon"));
 	public static final TagKey<Item> CHARGED_RANGED_WEAPON = ItemTags.create(new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
@@ -97,8 +100,7 @@ public class Hooks {
 			if (entity.isPassenger() || !entity.canChangeDimensions()) {
 				continue;
 			}
-			if (entity instanceof Mob) {
-				Mob mob = (Mob) entity;
+			if (entity instanceof Mob mob) {
 				if (mob.isLeashed()) {
 					if (mob.getLeashHolder() == player) {
 						entities.add(mob);
@@ -106,12 +108,8 @@ public class Hooks {
 					continue;
 				}
 			}
-			if (entity instanceof TamableAnimal) {
-				TamableAnimal tamable = (TamableAnimal) entity;
-				if (tamable.isOrderedToSit()) {
-					continue;
-				}
-				if (Objects.equals(player.getUUID(), tamable.getOwnerUUID())) {
+			if (entity instanceof TamableAnimal tamable) {
+				if (Objects.equals(player.getUUID(), tamable.getOwnerUUID()) && shouldFollowOwner(player, tamable)) {
 					entities.add(tamable);
 					continue;
 				}
@@ -168,9 +166,8 @@ public class Hooks {
 
 	public static void handleChunkPreUnload(List<net.minecraft.world.level.entity.EntityAccess> entities) {
 		for (net.minecraft.world.level.entity.EntityAccess entity : entities) {
-			if (entity instanceof TamableAnimal) {
-				TamableAnimal pet = (TamableAnimal) entity;
-				if (shouldFollowOwner(pet)) {
+			if (entity instanceof TamableAnimal pet) {
+				if (shouldFollowOwner(pet.getOwner(), pet)) {
 					BlockPos pos = pet.getOwner().blockPosition();
 					if (!teleportWithRandomOffset(pet, pos)) {
 						pet.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false);
@@ -180,12 +177,16 @@ public class Hooks {
 		}
 	}
 
-	public static boolean shouldFollowOwner(TamableAnimal pet) {
-		if (pet.isLeashed() || pet.isOrderedToSit() || pet.isPassenger()) {
+	public static boolean shouldFollowOwner(LivingEntity owner, TamableAnimal pet) {
+		if (owner == null || pet.isLeashed() || pet.isOrderedToSit() || pet.isPassenger()) {
 			return false;
 		}
-		LivingEntity owner = pet.getOwner();
-		if (owner == null || owner.isDeadOrDying() || owner.isSpectator()) {
+		if (alexsMobs) {
+			if (pet instanceof IFollower follower && !follower.shouldFollow()) {
+				return false;
+			}
+		}
+		if (owner.isDeadOrDying() || owner.isSpectator()) {
 			return false;
 		}
 		return FOLLOWABLE_CACHE.computeIfAbsent(pet.getClass(), $ -> {
