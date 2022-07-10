@@ -2,7 +2,6 @@ package snownee.companion;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.UUID;
 
 import com.google.common.collect.Lists;
@@ -16,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -123,7 +123,7 @@ public class Hooks {
 	}
 
 	public static boolean teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos) {
-		Random random = entity.getRandom();
+		RandomSource random = entity.getRandom();
 		MutableBlockPos pos = new MutableBlockPos();
 		for (int i = 0; i < 10; ++i) {
 			int j = randomIntInclusive(random, -2, 2);
@@ -139,7 +139,7 @@ public class Hooks {
 		return false;
 	}
 
-	private static int randomIntInclusive(Random random, int i, int j) {
+	private static int randomIntInclusive(RandomSource random, int i, int j) {
 		return random.nextInt(j - i + 1) + i;
 	}
 
