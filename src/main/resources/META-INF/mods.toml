@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[42,)"
+loaderVersion="[41,)"
 license="ARR"
 
 [[mods]]
@@ -13,14 +13,14 @@ description="Protect your pets."
 [[dependencies.companion]]
     modId="forge"
     mandatory=true
-    versionRange="[42,)"
+    versionRange="[41,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.companion]]
     modId="kiwi"
     mandatory=true
-    versionRange="[8,)"
+    versionRange="[7,)"
     ordering="NONE"
     side="BOTH"
 

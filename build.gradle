@@ -184,28 +184,12 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
     
-    // Real mod deobf dependency examples - these get remapped to your current mappings
-    //compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}") // Adds JEI API as a compile dependency
-    //runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}") // Adds the full JEI mod as a runtime dependency
-    // implementation fg.deobf("com.tterrag.registrate:Registrate:MC${mc_version}-${registrate_version}") // Adds registrate as a dependency
-	
     implementation fg.deobf("curse.maven:jei-238222:3905244")
     implementation fg.deobf("curse.maven:jade-324717:3903693")
     implementation fg.deobf("curse.maven:kiwi-303657:3908296")
     annotationProcessor "curse.maven:kiwi-303657:3908296"
     implementation fg.deobf("curse.maven:alexs-mobs-426558:3904520")
     implementation fg.deobf("curse.maven:citadel-331936:3902867")
-
-    // Examples using mod jars from ./libs
-    //implementation fg.deobf("libs:Kiwi-1.18:5.0.0")
-    //annotationProcessor "libs:Kiwi-1.18:5.0.0:processor"
-    //annotationProcessor "libs:Kiwi-1.18:5.0.0"
-	
-    //implementation fg.deobf("libs:Jade-1.18:3.1.6")
-
-    // For more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
 }
 
 processResources {
