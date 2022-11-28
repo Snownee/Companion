@@ -190,6 +190,7 @@ dependencies {
     annotationProcessor "curse.maven:kiwi-303657:3908296"
     implementation fg.deobf("curse.maven:alexs-mobs-426558:3904520")
     implementation fg.deobf("curse.maven:citadel-331936:3902867")
+    implementation fg.deobf("curse.maven:the-twilight-forest-227639:4075841")
 }
 
 processResources {
