@@ -16,9 +16,10 @@ public class Companion implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger(Companion.ID);
 
 	public static final GameRules.Key<GameRules.BooleanValue> PET_FRIENDLY_FIRE = GameRuleRegistry.register("petFriendlyFire", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
+	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = GameRuleRegistry.register("companion:alwaysTeleportHorses", GameRules.Category.PLAYER, GameRuleFactory.createBooleanRule(true));
 
 	@Override
 	public void onInitialize() {
-		// load gamerule
+		// load gamerules
 	}
 }

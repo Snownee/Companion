@@ -2,12 +2,16 @@ package snownee.companion;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
+import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Registry;
@@ -35,6 +39,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
+import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.Vec3;
 import snownee.companion.mixin.EntityAccess;
 import snownee.companion.mixin.MobAccess;
 
@@ -68,13 +74,15 @@ public class Hooks {
 				return;
 			}
 		}
-		for (LivingEntity entity : getAllPets(from, player)) {
+		for (Entity entity : getAllPets(from, player)) {
 			if (nether) {
 				((EntityAccess) entity).setPortalCooldown(0);
 				((EntityAccess) entity).callHandleInsidePortal(portalPos);
 			}
 			entity.setPortalCooldown();
-			entity = (LivingEntity) entity.changeDimension(to);
+			PortalInfo portal = CompanionTeleporter.INSTANCE.getPortalInfo(entity, to, null);
+			if (portal != null)
+				FabricDimensions.teleport(entity, to, portal);
 
 			// this is buggy... position change will not be sync to the client properly..
 			// i guess an extra packet is needed
@@ -84,13 +92,13 @@ public class Hooks {
 		}
 	}
 
-	public static List<LivingEntity> getAllPets(ServerLevel level, ServerPlayer player) {
+	public static List<Entity> getAllPets(ServerLevel level, ServerPlayer player) {
 		int max = CompanionCommonConfig.portalMaxTeleportedPets;
 		if (max == -1) {
 			max = level.getGameRules().getInt(GameRules.RULE_MAX_ENTITY_CRAMMING);
 		}
 		traveling = true;
-		List<LivingEntity> entities = Lists.newArrayList();
+		List<Entity> entities = Lists.newArrayList();
 		for (Entity entity : level.getAllEntities()) {
 			if (entities.size() >= max) {
 				break;
@@ -106,14 +114,8 @@ public class Hooks {
 					}
 					continue;
 				}
-			}
-			if (entity instanceof TamableAnimal) {
-				TamableAnimal tamable = (TamableAnimal) entity;
-				if (tamable.isOrderedToSit()) {
-					continue;
-				}
-				if (Objects.equals(player.getUUID(), tamable.getOwnerUUID())) {
-					entities.add(tamable);
+				if (Objects.equals(player.getUUID(), getEntityOwnerUUID(mob)) && shouldFollowOwner(player, mob)) {
+					entities.add(mob);
 					continue;
 				}
 			}
@@ -122,7 +124,7 @@ public class Hooks {
 		return entities;
 	}
 
-	public static boolean teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos) {
+	public static Optional<Vec3> teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos) {
 		RandomSource random = entity.getRandom();
 		MutableBlockPos pos = new MutableBlockPos();
 		for (int i = 0; i < 10; ++i) {
@@ -131,12 +133,10 @@ public class Hooks {
 			int l = randomIntInclusive(random, -2, 2);
 			pos.set(blockPos.getX() + j, blockPos.getY() + k, blockPos.getZ() + l);
 			if (canTeleportTo(entity, pos)) {
-				entity.teleportTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
-				//				entity.level.setBlockAndUpdate(pos.above(), Blocks.DIAMOND_BLOCK.defaultBlockState());
-				return true;
+				return Optional.of(new Vec3(pos.getX() + .5, pos.getY(), pos.getZ() + .5));
 			}
 		}
-		return false;
+		return Optional.empty();
 	}
 
 	private static int randomIntInclusive(RandomSource random, int i, int j) {
@@ -149,7 +149,7 @@ public class Hooks {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
-		return entity.level.noCollision(entity, entity.getBoundingBox().move(blockPos2));
+		return entity.level.noCollision(entity, entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
 	}
 
 	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy, LivingEntity owner) {
@@ -168,26 +168,39 @@ public class Hooks {
 	}
 
 	public static void handleChunkPreUnload(List<net.minecraft.world.level.entity.EntityAccess> entities) {
-		for (net.minecraft.world.level.entity.EntityAccess entity : entities) {
-			if (entity instanceof TamableAnimal) {
-				TamableAnimal pet = (TamableAnimal) entity;
-				if (shouldFollowOwner(pet)) {
-					BlockPos pos = pet.getOwner().blockPosition();
-					if (!teleportWithRandomOffset(pet, pos)) {
-						pet.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false);
+		for (var entityAccess : entities) {
+			if (entityAccess instanceof Mob) {
+				Mob entity = (Mob) entityAccess;
+				UUID ownerUUID = getEntityOwnerUUID(entity);
+				Player owner = entity.level.getServer().getPlayerList().getPlayer(ownerUUID);
+				if (shouldFollowOwner(owner, entity)) {
+					BlockPos pos = owner.blockPosition();
+					Entity newEntity = entity;
+					if (owner.level != entity.level) {
+						continue;
+						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
+					}
+					if (newEntity instanceof LivingEntity living) {
+						teleportWithRandomOffset(living, pos).ifPresentOrElse(vec -> {
+							living.teleportTo(vec.x, vec.y, vec.z);
+						}, () -> {
+							living.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false);
+						});
 					}
 				}
 			}
 		}
 	}
 
-	public static boolean shouldFollowOwner(TamableAnimal pet) {
-		if (pet.isLeashed() || pet.isOrderedToSit() || pet.isPassenger()) {
+	public static boolean shouldFollowOwner(LivingEntity owner, Mob pet) {
+		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
 			return false;
 		}
-		LivingEntity owner = pet.getOwner();
-		if (owner == null || owner.isDeadOrDying() || owner.isSpectator()) {
+		if (pet instanceof TamableAnimal animal && animal.isOrderedToSit()) {
 			return false;
+		}
+		if (pet instanceof AbstractHorse) {
+			return pet.level.getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
 		}
 		return FOLLOWABLE_CACHE.computeIfAbsent(pet.getClass(), $ -> {
 			for (WrappedGoal goal : ((MobAccess) pet).getGoalSelector().getAvailableGoals()) {
@@ -222,27 +235,24 @@ public class Hooks {
 		return false;
 	}
 
+	@Nullable
 	public static Player getEntityOwner(Entity entity) {
-		UUID ownerUUID = null;
-		if (entity instanceof OwnableEntity) {
-			ownerUUID = ((OwnableEntity) entity).getOwnerUUID();
-		} else if (entity instanceof AbstractHorse) {
-			ownerUUID = ((AbstractHorse) entity).getOwnerUUID();
-		}
+		UUID ownerUUID = getEntityOwnerUUID(entity);
 		if (ownerUUID == null) {
 			return null;
 		}
-		return entity.level.getPlayerByUUID(ownerUUID);
+		return entity.level.getServer().getPlayerList().getPlayer(ownerUUID);
 	}
 
-	public static boolean hasOwner(Entity entity) {
+	@Nullable
+	public static UUID getEntityOwnerUUID(Entity entity) {
 		if (entity instanceof OwnableEntity) {
-			return ((OwnableEntity) entity).getOwnerUUID() != null;
+			return ((OwnableEntity) entity).getOwnerUUID();
 		}
 		if (entity instanceof AbstractHorse) {
-			return ((AbstractHorse) entity).getOwnerUUID() != null;
+			return ((AbstractHorse) entity).getOwnerUUID();
 		}
-		return false;
+		return null;
 	}
 
 }

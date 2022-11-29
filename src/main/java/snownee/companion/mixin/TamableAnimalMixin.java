@@ -16,11 +16,11 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 	@Override
 	public void tryTeleportToOwner(DamageSource damageSource) {
 		TamableAnimal entity = (TamableAnimal) (Object) this;
-		if (!Hooks.isInjured(entity) || !Hooks.shouldFollowOwner(entity)) {
+		if (!Hooks.isInjured(entity)) {
 			return;
 		}
 		LivingEntity owner = entity.getOwner();
-		if (owner == damageSource.getEntity()) {
+		if (owner == damageSource.getEntity() || !Hooks.shouldFollowOwner(owner, entity)) {
 			return;
 		}
 		long time = entity.level.getGameTime();

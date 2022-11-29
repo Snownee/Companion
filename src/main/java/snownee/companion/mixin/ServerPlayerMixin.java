@@ -24,7 +24,7 @@ public class ServerPlayerMixin {
 	@Inject(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
-			), method = "changeDimension", locals = LocalCapture.CAPTURE_FAILHARD
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILHARD
 	)
 	private void companion_changeDimension(ServerLevel to, CallbackInfoReturnable<Entity> cir, ServerLevel from, ResourceKey resourceKey, LevelData levelData, PlayerList playerList, PortalInfo portalInfo) {
 		if (CompanionCommonConfig.portalTeleportingPets)
@@ -34,7 +34,7 @@ public class ServerPlayerMixin {
 	@Inject(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"
-			), method = "changeDimension"
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;"
 	)
 	private void companion_returnFromEnd(ServerLevel to, CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {

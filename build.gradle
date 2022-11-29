@@ -21,6 +21,14 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    //maven {
+    //    url = "https://modmaven.dev/"
+    //}
+    maven { url = "https://mvn.devos.one/snapshots/" }
+    maven { url = "https://maven.jamieswhiteshirt.com/libs-release" } // Reach Entity Attributes
+    maven { url = "https://jitpack.io" } // Fabric ASM, Mixin Extras
+    maven { url = "https://ladysnake.jfrog.io/artifactory/mods" } // Cardinal Components API
+    maven { url = "https://api.modrinth.com/maven" }
     flatDir { dir 'libs' }
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -51,10 +59,19 @@ dependencies {
     }
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
-    modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    //modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
+    //modRuntimeOnly "me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}"
     
-    modImplementation "curse.maven:kiwi-549404:3871802"
+    modImplementation "curse.maven:kiwi-549404:4036309"
+    modImplementation "io.github.fabricators_of_create.Porting-Lib:porting-lib:${project.port_lib_version}+${project.minecraft_version}"
+    modImplementation "curse.maven:the-twilight-forest-227639:4086723"
+    implementation "com.electronwill.night-config:core:3.6.3"
+    implementation "com.electronwill.night-config:toml:3.6.3"
+    modImplementation "curse.maven:forge-config-api-port-fabric-547434:4104948"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${project.cca_version}"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${project.cca_version}"
+    modImplementation "com.jamieswhiteshirt:reach-entity-attributes:${project.reach_entity_attributes_version}"
+    modImplementation "maven.modrinth:here-be-no-dragons:1.0.0"
     //modImplementation "libs:Kiwi-1.18.1-fabric:${project.kiwi_version}"
 }
 
