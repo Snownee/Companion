@@ -1,2 +1,6 @@
 {
+  "gamerule.petFriendlyFire": "宠物友军开火",
+  "gamerule.petFriendlyFire.description": "能够伤害你的宠物。（由Companion添加）",
+  "gamerule.companion:alwaysTeleportHorses": "总是传送马匹",
+  "gamerule.companion:alwaysTeleportHorses.description": "当马匹离你太远时，总是传送马匹。（由Companion添加）"
 }
