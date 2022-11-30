@@ -24,8 +24,8 @@ public class ServerPlayerMixinPortingLib {
 	@SuppressWarnings("rawtypes")
 	@Inject(
 			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V", remap = true
-			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILSOFT, remap = false, require = 0
+					value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILSOFT, require = 0
 	)
 	private void companion_changeDimension(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir, ServerLevel from, ResourceKey resourcekey, LevelData leveldata, PlayerList playerlist, PortalInfo portalinfo, Entity e) {
 		if (CompanionCommonConfig.portalTeleportingPets)
@@ -34,8 +34,8 @@ public class ServerPlayerMixinPortingLib {
 
 	@Inject(
 			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V", remap = true
-			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", remap = false, require = 0
+					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", require = 0
 	)
 	private void companion_returnFromEnd(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
