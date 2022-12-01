@@ -1,6 +1,7 @@
 package snownee.companion.mixin;
 
 import java.util.Objects;
+import java.util.UUID;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -50,8 +51,9 @@ public class EntityMixin {
 			return;
 		}
 		Entity entity = (Entity) (Object) this;
-		if (Hooks.hasOwner(entity)) {
-			Player owner = Hooks.getEntityOwner(entity);
+		UUID ownerUUID = Hooks.getEntityOwnerUUID(entity);
+		if (ownerUUID != null) {
+			Player owner = entity.level.getPlayerByUUID(ownerUUID);
 			if (owner == null || owner.distanceToSqr(entity) > r * r) {
 				ci.setReturnValue(false);
 			}
