@@ -19,8 +19,8 @@ description="Protect your pets."
 
 [[dependencies.companion]]
     modId="kiwi"
-    mandatory=true
-    versionRange="[6,)"
+    mandatory=false
+    versionRange="[6,7)"
     ordering="NONE"
     side="BOTH"
 
