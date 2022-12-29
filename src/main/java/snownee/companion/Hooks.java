@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,8 +47,8 @@ import snownee.companion.mixin.MobAccess;
 public class Hooks {
 
 	public static boolean traveling;
-	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Companion.ID, "ranged_weapon"));
-	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
+	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
+	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 
 	// Here is a bug that tamed wolf reset their health when it travels through portal.

@@ -23,7 +23,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
 		if ("snownee.companion.mixin.ServerPlayerMixinPortingLib".equals(mixinClassName)) {
-			return FabricLoader.getInstance().isModLoaded("porting_lib");
+			return FabricLoader.getInstance().isModLoaded("porting_lib_extensions");
 		}
 		return true;
 	}
