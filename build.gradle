@@ -78,8 +78,6 @@ dependencies {
     //modImplementation "com.jamieswhiteshirt:reach-entity-attributes:${project.reach_entity_attributes_version}"
     modImplementation "maven.modrinth:here-be-no-dragons:1.0.0"
     //modImplementation "libs:Kiwi-1.18.1-fabric:${project.kiwi_version}"
-    
-    modImplementation "curse.maven:indypets-320967:4143543"
 }
 
 loom {
