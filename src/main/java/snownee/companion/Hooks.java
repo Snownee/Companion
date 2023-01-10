@@ -8,10 +8,12 @@ import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lizin5ths.indypets.util.IndyPetsUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.registries.Registries;
@@ -47,6 +49,7 @@ import snownee.companion.mixin.MobAccess;
 public class Hooks {
 
 	public static boolean traveling;
+	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
 	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
 	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
@@ -201,8 +204,15 @@ public class Hooks {
 		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
 			return false;
 		}
-		if (pet instanceof TamableAnimal animal && animal.isOrderedToSit()) {
-			return false;
+		if (pet instanceof TamableAnimal animal) {
+			if (animal.isOrderedToSit()) {
+				return false;
+			}
+			if (indyPets) {
+				if (IndyPetsUtil.isIndependent(animal)) {
+					return false;
+				}
+			}
 		}
 		if (pet instanceof AbstractHorse) {
 			return pet.level.getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
