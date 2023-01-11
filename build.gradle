@@ -171,6 +171,7 @@ repositories {
     maven {
         url = "https://www.cursemaven.com"
     }
+    maven { url "https://maven.shedaniel.me/" }
 }
 
 mixin {
@@ -189,13 +190,14 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
     
-    implementation fg.deobf("curse.maven:jei-238222:3905244")
-    implementation fg.deobf("curse.maven:jade-324717:3903693")
-    implementation fg.deobf("curse.maven:kiwi-303657:3908296")
-    annotationProcessor "curse.maven:kiwi-303657:3908296"
-    implementation fg.deobf("curse.maven:alexs-mobs-426558:3904520")
-    implementation fg.deobf("curse.maven:citadel-331936:3902867")
-    implementation fg.deobf("curse.maven:the-twilight-forest-227639:4075841")
+    //implementation fg.deobf("curse.maven:jei-238222:3905244")
+    implementation fg.deobf("curse.maven:jade-324717:4318720")
+    implementation fg.deobf("curse.maven:kiwi-303657:4287363")
+    annotationProcessor "curse.maven:kiwi-303657:4287363"
+    implementation fg.deobf("curse.maven:alexs-mobs-426558:4183112")
+    implementation fg.deobf("curse.maven:citadel-331936:4291603")
+    //implementation fg.deobf("curse.maven:the-twilight-forest-227639:4075841")
+    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:9.0.94")
 }
 
 processResources {
@@ -242,7 +244,7 @@ modrinth {
     versionNumber = project.mod_version // You don't need to set this manually. Will fail if Modrinth has this version already
     versionType = "release" // This is the default -- can also be `beta` or `alpha`
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-    gameVersions = ["1.19.2"] // Must be an array, even with only one version
+    gameVersions = ["1.19.3"] // Must be an array, even with only one version
     loaders = ["forge"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
     dependencies { // A special DSL for creating dependencies
         // scope.type
