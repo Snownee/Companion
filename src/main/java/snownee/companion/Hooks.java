@@ -169,13 +169,7 @@ public class Hooks {
 		for (var entityAccess : entities) {
 			if (entityAccess instanceof Mob) {
 				Mob entity = (Mob) entityAccess;
-				UUID ownerUUID = getEntityOwnerUUID(entity);
-				Player owner;
-				if (entity.level.getServer() == null) {
-					owner = entity.level.getPlayerByUUID(ownerUUID);
-				} else {
-					owner = entity.level.getServer().getPlayerList().getPlayer(ownerUUID);
-				}
+				Player owner = getEntityOwner(entity);
 				if (shouldFollowOwner(owner, entity)) {
 					BlockPos pos = owner.blockPosition();
 					Entity newEntity = entity;
