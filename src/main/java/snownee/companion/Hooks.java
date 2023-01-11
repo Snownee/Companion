@@ -175,6 +175,9 @@ public class Hooks {
 			if (entityAccess instanceof Mob) {
 				Mob entity = (Mob) entityAccess;
 				UUID ownerUUID = getEntityOwnerUUID(entity);
+				if (ownerUUID == null) {
+					continue;
+				}
 				Player owner;
 				if (entity.level.getServer() == null) {
 					owner = entity.level.getPlayerByUUID(ownerUUID);
