@@ -1,0 +1,6 @@
+{
+  "gamerule.petFriendlyFire": "Дружній вогонь для улюбленців",
+  "gamerule.petFriendlyFire.description": "Дружній вогонь для улюбленців. (від Companion)",
+  "gamerule.companion:alwaysTeleportHorses": "Завжди телепортувати коня",
+  "gamerule.companion:alwaysTeleportHorses.description": "Завжди телепортувати вашого коня, якщо він надто далеко від вас. (від Companion)"
+}
