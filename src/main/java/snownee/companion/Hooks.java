@@ -31,6 +31,7 @@ import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
@@ -204,7 +205,7 @@ public class Hooks {
 	}
 
 	public static boolean shouldFollowOwner(LivingEntity owner, Mob pet) {
-		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
+		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.getLeashHolder() instanceof HangingEntity || pet.isPassenger()) {
 			return false;
 		}
 		if (pet instanceof TamableAnimal animal) {
