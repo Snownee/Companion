@@ -14,5 +14,5 @@ public class Companion {
 	public static final Logger LOGGER = LogManager.getLogger(Companion.ID);
 
 	public static final GameRules.Key<GameRules.BooleanValue> PET_FRIENDLY_FIRE = GameRules.register("petFriendlyFire", GameRules.Category.PLAYER, BooleanValueAccess.callCreate(true));
-	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = GameRules.register("companion:alwaysTeleportHorses", GameRules.Category.PLAYER, BooleanValueAccess.callCreate(true));
+	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = GameRules.register("companion:alwaysTeleportHorses", GameRules.Category.PLAYER, BooleanValueAccess.callCreate(false));
 }
