@@ -1,6 +1,6 @@
 {
-  "gamerule.petFriendlyFire": "fogo amigo dos animais de estimação",
-  "gamerule.petFriendlyFire.description": "Fogo amigo dos animais de estimação. (pelo mod companheiro)",
+  "gamerule.companion:petFriendlyFire": "fogo amigo dos animais de estimação",
+  "gamerule.companion:petFriendlyFire.description": "Fogo amigo dos animais de estimação. (pelo mod companheiro)",
   "gamerule.companion:alwaysTeleportHorses": "Sempre teletransportar cavalo",
   "gamerule.companion:alwaysTeleportHorses.description": "Sempre teletransporta seus cavalos se eles estiverem muito longe de você. (pelo mod companheiro)"
 }

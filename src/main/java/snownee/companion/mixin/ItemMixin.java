@@ -23,10 +23,10 @@ public class ItemMixin {
 		if (stack.is(Items.STRUCTURE_VOID) && player.hasPermissions(2)) {
 			if (entity instanceof TamableAnimal tamable) {
 				tamable.tame(player);
-				ci.setReturnValue(InteractionResult.sidedSuccess(player.level.isClientSide));
+				ci.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
 			} else if (entity instanceof AbstractHorse horse) {
 				horse.tameWithName(player);
-				ci.setReturnValue(InteractionResult.sidedSuccess(player.level.isClientSide));
+				ci.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
 			}
 		}
 	}

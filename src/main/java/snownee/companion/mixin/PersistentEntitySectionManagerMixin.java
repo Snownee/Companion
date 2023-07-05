@@ -2,6 +2,7 @@ package snownee.companion.mixin;
 
 import java.util.List;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,12 +21,15 @@ import snownee.companion.Hooks;
 @Mixin(PersistentEntitySectionManager.class)
 public abstract class PersistentEntitySectionManagerMixin {
 
+	@Final
 	@Shadow
 	private LongSet chunksToUnload;
+	@Final
 	@Shadow
 	private Long2ObjectMap<Visibility> chunkVisibility;
+	@Final
 	@Shadow
-	private EntitySectionStorage<EntityAccess> sectionStorage;
+	EntitySectionStorage<EntityAccess> sectionStorage;
 
 	@Inject(
 			at = @At(

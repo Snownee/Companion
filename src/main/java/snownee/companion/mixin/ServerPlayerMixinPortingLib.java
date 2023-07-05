@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import io.github.fabricators_of_create.porting_lib.extensions.ITeleporter;
+import io.github.fabricators_of_create.porting_lib.entity.ITeleporter;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,7 +25,7 @@ public class ServerPlayerMixinPortingLib {
 	@Inject(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
-			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILSOFT, require = 0
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/entity/ITeleporter;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILHARD, require = 0
 	)
 	private void companion_changeDimension(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir, ServerLevel from, ResourceKey resourcekey, LevelData leveldata, PlayerList playerlist, PortalInfo portalinfo, Entity e) {
 		if (CompanionCommonConfig.portalTeleportingPets)
@@ -35,12 +35,12 @@ public class ServerPlayerMixinPortingLib {
 	@Inject(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"
-			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/extensions/ITeleporter;)Lnet/minecraft/world/entity/Entity;", require = 0
+			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/entity/ITeleporter;)Lnet/minecraft/world/entity/Entity;", require = 0
 	)
 	private void companion_returnFromEnd(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
 			ServerPlayer player = (ServerPlayer) (Object) this;
-			Hooks.changeDimension(player, to, player.getLevel(), true);
+			Hooks.changeDimension(player, to, player.serverLevel(), true);
 		}
 	}
 

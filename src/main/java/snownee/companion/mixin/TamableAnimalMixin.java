@@ -23,7 +23,7 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 		if (owner == damageSource.getEntity() || !Hooks.shouldFollowOwner(owner, entity)) {
 			return;
 		}
-		long time = entity.level.getGameTime();
+		long time = entity.level().getGameTime();
 		long interval = time - lastTeleportation;
 		if (interval > 0 && interval < 600) {
 			return;

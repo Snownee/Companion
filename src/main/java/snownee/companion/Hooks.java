@@ -16,7 +16,7 @@ import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,8 +51,8 @@ public class Hooks {
 
 	public static boolean traveling;
 	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
-	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Companion.ID, "ranged_weapon"));
-	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
+	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
+	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 
 	// Here is a bug that tamed wolf reset their health when it travels through portal.
@@ -62,11 +62,11 @@ public class Hooks {
 			return;
 		}
 		if (returnFromEnd) {
-			if (player.level != from) {
+			if (player.level() != from) {
 				return;
 			}
 		} else {
-			if (player.level != to) {
+			if (player.level() != to) {
 				return;
 			}
 		}
@@ -148,12 +148,12 @@ public class Hooks {
 	}
 
 	private static boolean canTeleportTo(Entity entity, BlockPos blockPos) {
-		BlockPathTypes blockPathTypes = WalkNodeEvaluator.getBlockPathTypeStatic(entity.level, blockPos.mutable());
+		BlockPathTypes blockPathTypes = WalkNodeEvaluator.getBlockPathTypeStatic(entity.level(), blockPos.mutable());
 		if (blockPathTypes != BlockPathTypes.WALKABLE) {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
-		return entity.level.noCollision(entity, entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
+		return entity.level().noCollision(entity, entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
 	}
 
 	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy, LivingEntity owner) {
@@ -180,15 +180,15 @@ public class Hooks {
 					continue;
 				}
 				Player owner;
-				if (entity.level.getServer() == null) {
-					owner = entity.level.getPlayerByUUID(ownerUUID);
+				if (entity.level().getServer() == null) {
+					owner = entity.level().getPlayerByUUID(ownerUUID);
 				} else {
-					owner = entity.level.getServer().getPlayerList().getPlayer(ownerUUID);
+					owner = entity.level().getServer().getPlayerList().getPlayer(ownerUUID);
 				}
 				if (shouldFollowOwner(owner, entity)) {
 					BlockPos pos = owner.blockPosition();
 					Entity newEntity = entity;
-					if (owner.level != entity.level) {
+					if (owner.level() != entity.level()) {
 						continue;
 						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
@@ -219,7 +219,7 @@ public class Hooks {
 			}
 		}
 		if (pet instanceof AbstractHorse) {
-			return pet.level.getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
+			return pet.level().getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
 		}
 		return FOLLOWABLE_CACHE.computeIfAbsent(pet.getClass(), $ -> {
 			for (WrappedGoal goal : ((MobAccess) pet).getGoalSelector().getAvailableGoals()) {
@@ -260,19 +260,16 @@ public class Hooks {
 		if (ownerUUID == null) {
 			return null;
 		}
-		if (entity.level.getServer() == null) {
-			return entity.level.getPlayerByUUID(ownerUUID);
+		if (entity.level().getServer() == null) {
+			return entity.level().getPlayerByUUID(ownerUUID);
 		}
-		return entity.level.getServer().getPlayerList().getPlayer(ownerUUID);
+		return entity.level().getServer().getPlayerList().getPlayer(ownerUUID);
 	}
 
 	@Nullable
 	public static UUID getEntityOwnerUUID(Entity entity) {
 		if (entity instanceof OwnableEntity) {
 			return ((OwnableEntity) entity).getOwnerUUID();
-		}
-		if (entity instanceof AbstractHorse) {
-			return ((AbstractHorse) entity).getOwnerUUID();
 		}
 		return null;
 	}

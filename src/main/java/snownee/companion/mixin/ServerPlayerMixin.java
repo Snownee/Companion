@@ -39,7 +39,7 @@ public class ServerPlayerMixin {
 	private void companion_returnFromEnd(ServerLevel to, CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
 			ServerPlayer player = (ServerPlayer) (Object) this;
-			Hooks.changeDimension(player, to, player.getLevel(), true);
+			Hooks.changeDimension(player, to, player.serverLevel(), true);
 		}
 	}
 

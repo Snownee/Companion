@@ -1,5 +1,6 @@
 package snownee.companion.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +16,7 @@ import snownee.companion.Hooks;
 @Mixin(TargetGoal.class)
 public class TargetGoalMixin {
 
+	@Final
 	@Shadow
 	protected Mob mob;
 	@Shadow
