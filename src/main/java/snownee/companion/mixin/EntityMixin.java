@@ -28,7 +28,7 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
 	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
 		Entity entity = (Entity) (Object) this;
-		if (bl && !entity.level().isClientSide && entity.fallDistance > 0 && entity instanceof Player) {
+		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide && entity.fallDistance > 0 && entity instanceof Player) {
 			CompanionPlayer player = (CompanionPlayer) this;
 			Vec3 past = player.getJumpPos();
 			if (past == null) {
