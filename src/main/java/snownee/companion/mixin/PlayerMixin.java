@@ -22,7 +22,7 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	@Inject(at = @At("TAIL"), method = "aiStep")
 	private void companion_aiStep(CallbackInfo ci) {
 		Player player = (Player) (Object) this;
-		if (player.level.isClientSide) {
+		if (player.level().isClientSide) {
 			return;
 		}
 		if (player.isSleeping() || player.isInPowderSnow) {
@@ -56,7 +56,7 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	}
 
 	@Shadow
-	abstract void removeEntitiesOnShoulder();
+	protected abstract void removeEntitiesOnShoulder();
 
 	private Vec3 jumpPos;
 
@@ -84,7 +84,7 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	private void companion_attack(Entity entity, CallbackInfo ci) {
 		if (Hooks.getEntityOwner(entity) == (Object) this) {
 			Player self = (Player) (Object) this;
-			if (!self.level.getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
+			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.cancel();
 			}
 		}

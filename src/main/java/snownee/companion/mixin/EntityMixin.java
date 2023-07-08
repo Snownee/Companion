@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +28,7 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
 	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
 		Entity entity = (Entity) (Object) this;
-		if (bl && !entity.level.isClientSide && entity.fallDistance > 0 && entity instanceof Player) {
+		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide && entity.fallDistance > 0 && entity instanceof Player) {
 			CompanionPlayer player = (CompanionPlayer) this;
 			Vec3 past = player.getJumpPos();
 			if (past == null) {
@@ -53,7 +54,7 @@ public class EntityMixin {
 		Entity entity = (Entity) (Object) this;
 		UUID ownerUUID = Hooks.getEntityOwnerUUID(entity);
 		if (ownerUUID != null) {
-			Player owner = entity.level.getPlayerByUUID(ownerUUID);
+			Player owner = entity.level().getPlayerByUUID(ownerUUID);
 			if (owner == null || owner.distanceToSqr(entity) > r * r) {
 				ci.setReturnValue(false);
 			}
@@ -74,8 +75,8 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
 	private void companion_isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
 		Entity self = (Entity) (Object) this;
-		if (!damageSource.isExplosion() && damageSource.getEntity() != null && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
-			if (!self.level.getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
+		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
+			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.setReturnValue(true);
 			}
 		}

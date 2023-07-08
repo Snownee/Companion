@@ -189,13 +189,13 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
     
-    implementation fg.deobf("curse.maven:jei-238222:3905244")
-    implementation fg.deobf("curse.maven:jade-324717:3903693")
-    implementation fg.deobf("curse.maven:kiwi-303657:3908296")
-    annotationProcessor "curse.maven:kiwi-303657:3908296"
-    implementation fg.deobf("curse.maven:alexs-mobs-426558:3904520")
-    implementation fg.deobf("curse.maven:citadel-331936:3902867")
-    implementation fg.deobf("curse.maven:the-twilight-forest-227639:4075841")
+    implementation fg.deobf("curse.maven:jei-238222:4609866")
+    implementation fg.deobf("curse.maven:jade-324717:4614153")
+    implementation fg.deobf("curse.maven:kiwi-303657:4592974")
+    annotationProcessor "curse.maven:kiwi-303657:4592974"
+    implementation fg.deobf("curse.maven:alexs-mobs-426558:4618074")
+    implementation fg.deobf("curse.maven:citadel-331936:4613231")
+    //implementation fg.deobf("curse.maven:the-twilight-forest-227639:4075841")
 }
 
 processResources {
@@ -242,7 +242,7 @@ modrinth {
     versionNumber = project.mod_version // You don't need to set this manually. Will fail if Modrinth has this version already
     versionType = "release" // This is the default -- can also be `beta` or `alpha`
     uploadFile = jar // With Loom, this MUST be set to `remapJar` instead of `jar`!
-    gameVersions = ["1.19.2"] // Must be an array, even with only one version
+    gameVersions = ["1.20", "1.20.1"] // Must be an array, even with only one version
     loaders = ["forge"] // Must also be an array - no need to specify this if you're using Loom or ForgeGradle
     dependencies { // A special DSL for creating dependencies
         // scope.type
