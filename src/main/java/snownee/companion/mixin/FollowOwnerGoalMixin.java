@@ -1,5 +1,6 @@
 package snownee.companion.mixin;
 
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +15,7 @@ import snownee.companion.CompanionCommonConfig;
 @Mixin(FollowOwnerGoal.class)
 public class FollowOwnerGoalMixin {
 
+	@Final
 	@Shadow
 	private TamableAnimal tamable;
 	@Shadow

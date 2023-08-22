@@ -14,7 +14,7 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 	private long lastTeleportation = Long.MIN_VALUE;
 
 	@Override
-	public void tryTeleportToOwner(DamageSource damageSource) {
+	public void companion$tryTeleportToOwner(DamageSource damageSource) {
 		TamableAnimal entity = (TamableAnimal) (Object) this;
 		if (!Hooks.isInjured(entity)) {
 			return;
@@ -30,7 +30,9 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 		}
 		lastTeleportation = time;
 		entity.setTarget(null);
-		Hooks.teleportWithRandomOffset(entity, owner.blockPosition().relative(owner.getDirection().getOpposite(), 2));
+		Hooks.teleportWithRandomOffset(entity, owner.blockPosition().relative(owner.getDirection().getOpposite(), 3)).ifPresent(vec -> {
+			entity.teleportTo(vec.x, vec.y, vec.z);
+		});
 	}
 
 }

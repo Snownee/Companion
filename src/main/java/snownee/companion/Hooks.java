@@ -130,10 +130,10 @@ public class Hooks {
 	public static Optional<Vec3> teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos) {
 		RandomSource random = entity.getRandom();
 		MutableBlockPos pos = new MutableBlockPos();
-		for (int i = 0; i < 10; ++i) {
-			int j = randomIntInclusive(random, -2, 2);
+		for (int i = 0; i < 20; ++i) {
+			int j = randomIntInclusive(random, -3, 3);
 			int k = randomIntInclusive(random, -1, 1);
-			int l = randomIntInclusive(random, -2, 2);
+			int l = randomIntInclusive(random, -3, 3);
 			pos.set(blockPos.getX() + j, blockPos.getY() + k, blockPos.getZ() + l);
 			if (canTeleportTo(entity, pos)) {
 				return Optional.of(new Vec3(pos.getX() + .5, pos.getY(), pos.getZ() + .5));
