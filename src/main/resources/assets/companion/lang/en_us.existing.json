@@ -10,5 +10,8 @@
   "companion.config.shoulderPets.dismountFallDistance.desc": "Vanilla is 0.5",
   "companion.config.shoulderPets.dismountDamageThreshold.desc": "Vanilla is 0",
   "companion.config.follow.portalTeleportingPets.desc": "When you travel through portals, teleport your pets and leashed animals as well",
-  "companion.config.follow.portalMaxTeleportedPets.desc": "Max number of animals that will be teleported with you\n-1 = Use the value of maxEntityCramming gamerule"
+  "companion.config.follow.portalMaxTeleportedPets.desc": "Max number of animals that will be teleported with you\n-1 = Use the value of maxEntityCramming gamerule",
+  "companion.config.follow.logIfTeleportingFailed.desc": "Log to console if a pet failed to teleport when the chunk was unloaded",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Player Nearby Change Dimension Radius",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "Pet Won't Change Dimension Unless Owner Is Nearby"
 }
