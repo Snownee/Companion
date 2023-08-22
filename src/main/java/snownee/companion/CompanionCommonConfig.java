@@ -27,6 +27,8 @@ public final class CompanionCommonConfig {
 	public static float petWontChangeDimensionUnlessOwnerIsNearbyRadius = 3;
 	@Path("follow.petForceTeleportingIfFollowFailed")
 	public static boolean petForceTeleportingIfFollowFailed = true;
+	@Path("follow.logIfTeleportingFailed")
+	public static boolean logIfTeleportingFailed = true;
 
 	@Path("injuredStatus.healthRatio")
 	public static float petInjuredStatusHealthRatio = 0.2F;
