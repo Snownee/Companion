@@ -1,6 +1,17 @@
 {
-  "gamerule.companion:petFriendlyFire": "fogo amigo dos animais de estimação",
-  "gamerule.companion:petFriendlyFire.description": "Fogo amigo dos animais de estimação. (pelo mod companheiro)",
-  "gamerule.companion:alwaysTeleportHorses": "Sempre teletransportar cavalo",
-  "gamerule.companion:alwaysTeleportHorses.description": "Sempre teletransporta seus cavalos se eles estiverem muito longe de você. (pelo mod companheiro)"
+  "gamerule.companion:petFriendlyFire": "Fogo amigo dos animais de estimação",
+  "gamerule.companion:petFriendlyFire.description": "Fogo amigável para animais de estimação. (pelo mod Companion)",
+  "gamerule.companion:alwaysTeleportHorses": "Sempre teletransporte o cavalo",
+  "gamerule.companion:alwaysTeleportHorses.description": "Sempre teletransporta seus cavalos se eles estiverem muito longe de você. (pelo mod Companion)",
+  "companion.config.shoulderPets.smartDismount.desc": "Pule no lugar para desmontar animais de estimação",
+  "companion.config.shoulderPets.dismountInWater.desc": "Vanilla é verdadeiro",
+  "companion.config.shoulderPets.dismountUnderWater.desc": "Vanilla é verdadeiro",
+  "companion.config.shoulderPets.dismountWhileFlying.desc": "Vanilla é verdadeiro",
+  "companion.config.shoulderPets.dismountFallDistance.desc": "Vanilla é 0.5",
+  "companion.config.shoulderPets.dismountDamageThreshold.desc": "Vanilla é 0",
+  "companion.config.follow.portalTeleportingPets.desc": "Quando você viaja através de portais, teletransporte seus animais de estimação e também os animais presos no laço",
+  "companion.config.follow.portalMaxTeleportedPets.desc": "Número máximo de animais que serão teletransportados com você\n-1 = Use o valor da regra de jogo maxEntityCramming",
+  "companion.config.follow.logIfTeleportingFailed.desc": "Registrar no console se um animal de estimação não conseguiu se teletransportar quando o pedaço foi descarregado",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Jogador próximo altera raio de dimensão",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "O animal de estimação não mudará de dimensão a menos que o proprietário esteja por perto"
 }
