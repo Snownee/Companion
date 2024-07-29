@@ -4,10 +4,10 @@ import net.minecraft.world.phys.Vec3;
 
 public interface CompanionPlayer {
 
-	Vec3 getJumpPos();
+	Vec3 companion$getJumpPos();
 
-	void setJumpPos(Vec3 pos);
+	void companion$setJumpPos(Vec3 pos);
 
-	void removeShoulderEntities();
+	void companion$removeShoulderEntities();
 
 }

@@ -23,12 +23,23 @@ public class ServerPlayerMixin {
 	@SuppressWarnings("rawtypes")
 	@Inject(
 			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
-			), method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;", locals = LocalCapture.CAPTURE_FAILHARD
+					value = "INVOKE",
+					target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
+			),
+			method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;)Lnet/minecraft/world/entity/Entity;",
+			locals = LocalCapture.CAPTURE_FAILHARD
 	)
-	private void companion_changeDimension(ServerLevel to, CallbackInfoReturnable<Entity> cir, ServerLevel from, ResourceKey resourceKey, LevelData levelData, PlayerList playerList, PortalInfo portalInfo) {
-		if (CompanionCommonConfig.portalTeleportingPets)
+	private void companion_changeDimension(
+			ServerLevel to,
+			CallbackInfoReturnable<Entity> cir,
+			ServerLevel from,
+			ResourceKey resourceKey,
+			LevelData levelData,
+			PlayerList playerList,
+			PortalInfo portalInfo) {
+		if (CompanionCommonConfig.portalTeleportingPets) {
 			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, false);
+		}
 	}
 
 	@Inject(

@@ -1,7 +1,7 @@
 {
-  "KiwiConfig": [
-    {
-      "target": "snownee.companion.CompanionCommonConfig"
-    }
-  ]
+	"KiwiConfig": [
+		{
+			"target": "snownee.companion.CompanionCommonConfig"
+		}
+	]
 }

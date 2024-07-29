@@ -21,6 +21,8 @@ build
 # other
 eclipse
 run/*
+runs/*
 !run/scripts
 /logs
 /.factorypath
+/CHANGELOG.md

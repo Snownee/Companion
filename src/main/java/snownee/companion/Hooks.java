@@ -49,7 +49,9 @@ import snownee.companion.mixin.MobAccess;
 public class Hooks {
 
 	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
-	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
+	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(
+			Registries.ITEM,
+			new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 	public static boolean traveling;
 	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
@@ -84,8 +86,9 @@ public class Hooks {
 			}
 			entity.setPortalCooldown();
 			PortalInfo portal = CompanionTeleporter.INSTANCE.getPortalInfo(entity, to, null);
-			if (portal != null)
+			if (portal != null) {
 				FabricDimensions.teleport(entity, to, portal);
+			}
 
 			// this is buggy... position change will not be sync to the client properly..
 			// i guess an extra packet is needed
@@ -152,14 +155,12 @@ public class Hooks {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
-		return entity.level().noCollision(entity, entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
+		return entity.level().noCollision(
+				entity,
+				entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
 	}
 
-	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy, LivingEntity owner) {
-		return wantsToAttack0(pet, enemy) && pet.wantsToAttack(enemy, owner);
-	}
-
-	public static boolean wantsToAttack0(TamableAnimal pet, LivingEntity enemy) {
+	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
 			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
 		}
@@ -183,7 +184,8 @@ public class Hooks {
 					teleportWithRandomOffset(entity, pos).ifPresentOrElse(vec -> {
 						entity.teleportTo(vec.x, vec.y, vec.z);
 					}, () -> {
-						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) && CompanionCommonConfig.logIfTeleportingFailed) {
+						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
+								CompanionCommonConfig.logIfTeleportingFailed) {
 							Companion.LOGGER.warn("Failed to teleport {} to {}", entity, pos);
 						}
 					});
