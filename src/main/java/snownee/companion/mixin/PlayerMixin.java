@@ -2,6 +2,7 @@ package snownee.companion.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -58,16 +59,17 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	@Shadow
 	protected abstract void removeEntitiesOnShoulder();
 
-	private Vec3 jumpPos;
+	@Unique
+	private Vec3 companion$jumpPos;
 
 	@Override
 	public Vec3 companion$getJumpPos() {
-		return jumpPos;
+		return companion$jumpPos;
 	}
 
 	@Override
 	public void companion$setJumpPos(Vec3 pos) {
-		this.jumpPos = pos;
+		this.companion$jumpPos = pos;
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public abstract class PlayerMixin implements CompanionPlayer {
 
 	@Inject(at = @At("HEAD"), method = "jumpFromGround")
 	private void companion_jumpFromGround(CallbackInfo ci) {
-		jumpPos = ((Player) (Object) this).position();
+		companion$jumpPos = ((Player) (Object) this).position();
 	}
 
 	@Inject(at = @At("HEAD"), method = "attack", cancellable = true)

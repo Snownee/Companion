@@ -22,7 +22,7 @@ public class CompanionTeleporter implements ITeleporter {
 		if (owner == null) {
 			return null;
 		}
-		Vec3 dest = Hooks.teleportWithRandomOffset(owner, owner.blockPosition()).orElseGet(owner::position);
+		Vec3 dest = Hooks.teleportWithRandomOffset(owner, owner.blockPosition(), false).orElseGet(owner::position);
 		return new PortalInfo(dest, Vec3.ZERO, entity.getYRot(), entity.getXRot());
 	}
 

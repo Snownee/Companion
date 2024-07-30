@@ -11,6 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import snownee.companion.CompanionCommonConfig;
+import snownee.companion.Hooks;
 
 @Mixin(FollowOwnerGoal.class)
 public class FollowOwnerGoalMixin {
@@ -20,11 +21,16 @@ public class FollowOwnerGoalMixin {
 	private TamableAnimal tamable;
 	@Shadow
 	private LivingEntity owner;
+	@Shadow
+	@Final
+	private boolean canFly;
 
 	@Inject(at = @At("TAIL"), method = "teleportToOwner")
 	private void companion_teleportToOwner(CallbackInfo ci) {
 		if (CompanionCommonConfig.petForceTeleportingIfFollowFailed && owner != null) {
-			tamable.randomTeleport(owner.getX(), owner.getY(), owner.getZ(), false);
+			Hooks.teleportWithRandomOffset(tamable, owner.blockPosition(), canFly).ifPresent(vec -> {
+				tamable.teleportTo(vec.x, vec.y, vec.z);
+			});
 		}
 	}
 
