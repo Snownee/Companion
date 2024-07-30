@@ -1,6 +1,7 @@
 package snownee.companion.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -11,7 +12,8 @@ import snownee.companion.Hooks;
 @Mixin(TamableAnimal.class)
 public class TamableAnimalMixin implements CompanionTamableAnimal {
 
-	private long lastTeleportation = Long.MIN_VALUE;
+	@Unique
+	private long companion$lastTeleportation = Long.MIN_VALUE;
 
 	@Override
 	public void companion$tryTeleportToOwner(DamageSource damageSource) {
@@ -24,13 +26,13 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 			return;
 		}
 		long time = entity.level().getGameTime();
-		long interval = time - lastTeleportation;
+		long interval = time - companion$lastTeleportation;
 		if (interval > 0 && interval < 600) {
 			return;
 		}
-		lastTeleportation = time;
+		companion$lastTeleportation = time;
 		entity.setTarget(null);
-		Hooks.teleportWithRandomOffset(entity, owner.blockPosition().relative(owner.getDirection().getOpposite(), 3)).ifPresent(vec -> {
+		Hooks.teleportWithRandomOffset(entity, owner.blockPosition().relative(owner.getDirection().getOpposite(), 3), null).ifPresent(vec -> {
 			entity.teleportTo(vec.x, vec.y, vec.z);
 		});
 	}

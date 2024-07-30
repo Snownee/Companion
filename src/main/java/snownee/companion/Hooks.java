@@ -16,6 +16,7 @@ import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -26,9 +27,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Enemy;
@@ -39,6 +42,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.portal.PortalInfo;
@@ -130,7 +135,32 @@ public class Hooks {
 		return entities;
 	}
 
-	public static Optional<Vec3> teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos) {
+	public static Optional<Vec3> teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos, Boolean canFly) {
+		boolean _canFly = canFly != null ? canFly : entity instanceof FlyingAnimal;
+		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(entity, blockPos, _canFly);
+		if (vec3.isPresent() || _canFly) {
+			return vec3;
+		}
+		Level level = entity.level();
+		BlockPos heightmapPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockPos);
+		if (heightmapPos.getY() < blockPos.getY()) {
+			return teleportWithRandomOffsetInternal(entity, heightmapPos, false);
+		}
+		MutableBlockPos mutable = blockPos.mutable().move(Direction.DOWN);
+		for (int i = 0; i < 25; ++i) {
+			mutable.move(Direction.DOWN);
+			BlockState blockState = level.getBlockState(mutable);
+			if (Heightmap.Types.MOTION_BLOCKING.isOpaque().test(blockState)) {
+				return teleportWithRandomOffsetInternal(entity, mutable, false);
+			}
+		}
+		return Optional.empty();
+	}
+
+	private static Optional<Vec3> teleportWithRandomOffsetInternal(LivingEntity entity, BlockPos blockPos, boolean canFly) {
+		if (blockPos.distToCenterSqr(entity.position()) < 16) {
+			return Optional.empty();
+		}
 		RandomSource random = entity.getRandom();
 		MutableBlockPos pos = new MutableBlockPos();
 		for (int i = 0; i < 20; ++i) {
@@ -138,7 +168,7 @@ public class Hooks {
 			int k = randomIntInclusive(random, -1, 1);
 			int l = randomIntInclusive(random, -3, 3);
 			pos.set(blockPos.getX() + j, blockPos.getY() + k, blockPos.getZ() + l);
-			if (canTeleportTo(entity, pos)) {
+			if (canTeleportTo(entity, pos, canFly)) {
 				return Optional.of(new Vec3(pos.getX() + .5, pos.getY(), pos.getZ() + .5));
 			}
 		}
@@ -149,9 +179,32 @@ public class Hooks {
 		return random.nextInt(j - i + 1) + i;
 	}
 
-	private static boolean canTeleportTo(Entity entity, BlockPos blockPos) {
-		BlockPathTypes blockPathTypes = WalkNodeEvaluator.getBlockPathTypeStatic(entity.level(), blockPos.mutable());
-		if (blockPathTypes != BlockPathTypes.WALKABLE) {
+	private static boolean canTeleportTo(LivingEntity entity, BlockPos blockPos, boolean canFly) {
+		MutableBlockPos mutable = blockPos.mutable();
+		BlockPathTypes blockPathType = WalkNodeEvaluator.getBlockPathTypeStatic(entity.level(), mutable);
+		if (blockPathType == BlockPathTypes.OPEN && !canFly) {
+			return false;
+		}
+		if (entity instanceof PathfinderMob pathfinderMob) {
+			float f = pathfinderMob.getWalkTargetValue(blockPos);
+			if (blockPathType == BlockPathTypes.WATER) {
+				if (f > BlockPathTypes.WATER.getMalus()) {
+					return false;
+				}
+				mutable.move(Direction.UP);
+				BlockState aboveState = entity.level().getBlockState(mutable);
+				if (!aboveState.isAir()) {
+					return false;
+				}
+			} else if (blockPathType == BlockPathTypes.LAVA || blockPathType == BlockPathTypes.DAMAGE_FIRE ||
+					blockPathType == BlockPathTypes.DANGER_FIRE) {
+				if (!entity.fireImmune()) {
+					return false;
+				}
+			} else if (blockPathType != BlockPathTypes.WALKABLE && blockPathType != BlockPathTypes.OPEN) {
+				return false;
+			}
+		} else if (blockPathType != BlockPathTypes.WALKABLE && blockPathType != BlockPathTypes.OPEN) {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
@@ -168,7 +221,8 @@ public class Hooks {
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
-		return entity.getHealth() / entity.getMaxHealth() <= CompanionCommonConfig.petInjuredStatusHealthRatio;
+		return entity.getHealth() < entity.getMaxHealth() &&
+				entity.getHealth() / entity.getMaxHealth() <= CompanionCommonConfig.petInjuredStatusHealthRatio;
 	}
 
 	public static void handleChunkPreUnload(List<net.minecraft.world.level.entity.EntityAccess> entities) {
@@ -181,7 +235,7 @@ public class Hooks {
 						continue;
 						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
-					teleportWithRandomOffset(entity, pos).ifPresentOrElse(vec -> {
+					teleportWithRandomOffset(entity, pos, null).ifPresentOrElse(vec -> {
 						entity.teleportTo(vec.x, vec.y, vec.z);
 					}, () -> {
 						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&

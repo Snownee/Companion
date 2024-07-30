@@ -60,7 +60,7 @@ dependencies {
     }
 
 //    runtimeOnly("net.fabricmc:sponge-mixin:0.13.3+mixin.0.8.5")
-//    implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.0"))
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.0"))
 
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
