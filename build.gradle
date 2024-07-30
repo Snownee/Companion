@@ -188,7 +188,7 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
-    
+
     implementation fg.deobf("curse.maven:jei-238222:4609866")
     implementation fg.deobf("curse.maven:jade-324717:4614153")
     implementation fg.deobf("curse.maven:kiwi-303657:4592974")
@@ -205,6 +205,7 @@ processResources {
 }
 
 jar {
+    exclude("/assets/${project.mod_id}/lang/en_us.existing.json")
     manifest {
         attributes([
                 "Specification-Title": mod_id,
