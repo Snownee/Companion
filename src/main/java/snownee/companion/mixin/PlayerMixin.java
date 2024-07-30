@@ -61,17 +61,17 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	private Vec3 jumpPos;
 
 	@Override
-	public Vec3 getJumpPos() {
+	public Vec3 companion$getJumpPos() {
 		return jumpPos;
 	}
 
 	@Override
-	public void setJumpPos(Vec3 pos) {
+	public void companion$setJumpPos(Vec3 pos) {
 		this.jumpPos = pos;
 	}
 
 	@Override
-	public void removeShoulderEntities() {
+	public void companion$removeShoulderEntities() {
 		removeEntitiesOnShoulder();
 	}
 

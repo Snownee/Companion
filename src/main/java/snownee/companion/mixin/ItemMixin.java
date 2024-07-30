@@ -19,7 +19,12 @@ import net.minecraft.world.item.Items;
 public class ItemMixin {
 
 	@Inject(at = @At("HEAD"), method = "interactLivingEntity", cancellable = true)
-	private void companion_interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand, CallbackInfoReturnable<InteractionResult> ci) {
+	private void companion_interactLivingEntity(
+			ItemStack stack,
+			Player player,
+			LivingEntity entity,
+			InteractionHand hand,
+			CallbackInfoReturnable<InteractionResult> ci) {
 		if (stack.is(Items.STRUCTURE_VOID) && player.hasPermissions(2)) {
 			if (entity instanceof TamableAnimal tamable) {
 				tamable.tame(player);

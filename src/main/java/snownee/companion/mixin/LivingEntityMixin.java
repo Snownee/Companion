@@ -17,7 +17,8 @@ public class LivingEntityMixin {
 
 	@Inject(at = @At("TAIL"), method = "hurt")
 	private void companion_hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
-		if (CompanionCommonConfig.petTeleportToOwnerWhenInjured && !damageSource.is(DamageTypes.FELL_OUT_OF_WORLD) && (Object) this instanceof TamableAnimal) {
+		if (CompanionCommonConfig.petTeleportToOwnerWhenInjured && !damageSource.is(DamageTypes.FELL_OUT_OF_WORLD) &&
+				(Object) this instanceof TamableAnimal) {
 			((CompanionTamableAnimal) this).companion$tryTeleportToOwner(damageSource);
 		}
 	}

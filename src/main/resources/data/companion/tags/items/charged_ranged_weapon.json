@@ -1,7 +1,7 @@
 {
-  "replace": false,
-  "values": [
-    "bow",
-    "trident"
-  ]
+	"replace": false,
+	"values": [
+		"bow",
+		"trident"
+	]
 }

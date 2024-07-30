@@ -25,7 +25,7 @@ public class TargetGoalMixin {
 	@Inject(at = @At("HEAD"), method = "canContinueToUse", cancellable = true)
 	private void companion_canContinueToUse(CallbackInfoReturnable<Boolean> ci) {
 		if (targetMob != null && mob instanceof TamableAnimal && ((TamableAnimal) mob).isTame()) {
-			if (Hooks.wantsToAttack0((TamableAnimal) mob, targetMob)) {
+			if (Hooks.wantsToAttack((TamableAnimal) mob, targetMob)) {
 				ci.setReturnValue(false);
 			}
 		}

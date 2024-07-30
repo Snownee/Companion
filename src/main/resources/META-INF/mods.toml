@@ -1,21 +1,21 @@
-modLoader="javafml"
-loaderVersion="[41,)"
-license="ARR"
+modLoader = "javafml"
+loaderVersion = "[41,)"
+license = "ARR"
 
 [[mods]]
-modId="companion"
-version="${file.jarVersion}"
-displayName="Companion"
-authors="Snownee"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/companion"
-description="Protect your pets."
+modId = "companion"
+version = "${file.jarVersion}"
+displayName = "Companion"
+authors = "Snownee"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/companion"
+description = "Protect your pets."
 
 [[dependencies.companion]]
-    modId="kiwi"
-    mandatory=false
-    versionRange="[11,)"
-    ordering="NONE"
-    side="BOTH"
+modId = "kiwi"
+mandatory = false
+versionRange = "[11.8.15,)"
+ordering = "NONE"
+side = "BOTH"
 
 [modproperties.companion]
-    catalogueItemIcon="bone" #Support for Catalogue mod
+catalogueItemIcon = "bone" #Support for Catalogue mod

@@ -154,11 +154,7 @@ public class Hooks {
 				entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
 	}
 
-	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy, LivingEntity owner) {
-		return wantsToAttack0(pet, enemy) && pet.wantsToAttack(enemy, owner);
-	}
-
-	public static boolean wantsToAttack0(TamableAnimal pet, LivingEntity enemy) {
+	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
 			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
 		}

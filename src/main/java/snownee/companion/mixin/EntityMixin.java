@@ -28,16 +28,17 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
 	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
 		Entity entity = (Entity) (Object) this;
-		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide && entity.fallDistance > 0 && entity instanceof Player) {
+		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide && entity.fallDistance > 0 &&
+				entity instanceof Player) {
 			CompanionPlayer player = (CompanionPlayer) this;
-			Vec3 past = player.getJumpPos();
+			Vec3 past = player.companion$getJumpPos();
 			if (past == null) {
 				return;
 			}
 			Vec3 now = entity.position();
-			player.setJumpPos(null);
+			player.companion$setJumpPos(null);
 			if (Mth.equal(past.x, now.x) && Mth.equal(past.y, now.y) && Mth.equal(past.z, now.z)) {
-				player.removeShoulderEntities();
+				player.companion$removeShoulderEntities();
 			}
 		}
 	}
@@ -75,7 +76,8 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
 	private void companion_isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
 		Entity self = (Entity) (Object) this;
-		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null && Hooks.getEntityOwner(self) == damageSource.getEntity()) {
+		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null &&
+				Hooks.getEntityOwner(self) == damageSource.getEntity()) {
 			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.setReturnValue(true);
 			}

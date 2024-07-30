@@ -1,26 +1,26 @@
 {
-  "required": true,
-  "package": "snownee.companion.mixin",
-  "compatibilityLevel": "JAVA_16",
-  "refmap": "companion.refmap.json",
-  "mixins": [
-    "BooleanValueAccess",
-    "EntityAccess",
-    "EntityMixin",
-    "FollowOwnerGoalMixin",
-    "ItemMixin",
-    "LivingEntityMixin",
-    "OwnerHurtByTargetGoalMixin",
-    "OwnerHurtTargetGoalMixin",
-    "PersistentEntitySectionManagerMixin",
-    "PlayerMixin",
-    "PlayerMixinFailsafe",
-    "ServerPlayerMixin",
-    "TamableAnimalMixin",
-    "TargetGoalMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  },
-  "minVersion": "0.8"
+	"required": true,
+	"package": "snownee.companion.mixin",
+	"compatibilityLevel": "JAVA_16",
+	"refmap": "companion.refmap.json",
+	"mixins": [
+		"BooleanValueAccess",
+		"EntityAccess",
+		"EntityMixin",
+		"FollowOwnerGoalMixin",
+		"ItemMixin",
+		"LivingEntityMixin",
+		"OwnerHurtByTargetGoalMixin",
+		"OwnerHurtTargetGoalMixin",
+		"PersistentEntitySectionManagerMixin",
+		"PlayerMixin",
+		"PlayerMixinFailsafe",
+		"ServerPlayerMixin",
+		"TamableAnimalMixin",
+		"TargetGoalMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"minVersion": "0.8"
 }
