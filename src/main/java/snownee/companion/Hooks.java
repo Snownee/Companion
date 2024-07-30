@@ -48,7 +48,9 @@ public class Hooks {
 	public static boolean traveling;
 	public static boolean alexsMobs = ModList.get().isLoaded("alexsmobs");
 	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
-	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
+	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(
+			Registries.ITEM,
+			new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 
 	// Here is a bug that tamed wolf reset their health when it travels through portal.
@@ -147,7 +149,9 @@ public class Hooks {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
-		return entity.level().noCollision(entity, entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
+		return entity.level().noCollision(
+				entity,
+				entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
 	}
 
 	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy, LivingEntity owner) {
@@ -167,23 +171,22 @@ public class Hooks {
 
 	public static void handleChunkPreUnload(List<net.minecraft.world.level.entity.EntityAccess> entities) {
 		for (var entityAccess : entities) {
-			if (entityAccess instanceof Mob) {
-				Mob entity = (Mob) entityAccess;
+			if (entityAccess instanceof Mob entity) {
 				Player owner = getEntityOwner(entity);
 				if (shouldFollowOwner(owner, entity)) {
 					BlockPos pos = owner.blockPosition();
-					Entity newEntity = entity;
 					if (owner.level() != entity.level()) {
 						continue;
 						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
-					if (newEntity instanceof LivingEntity living) {
-						teleportWithRandomOffset(living, pos).ifPresentOrElse(vec -> {
-							living.teleportTo(vec.x, vec.y, vec.z);
-						}, () -> {
-							living.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false);
-						});
-					}
+					teleportWithRandomOffset(entity, pos).ifPresentOrElse(vec -> {
+						entity.teleportTo(vec.x, vec.y, vec.z);
+					}, () -> {
+						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
+								CompanionCommonConfig.logIfTeleportingFailed) {
+							Companion.LOGGER.warn("Failed to teleport {} to {}", entity, pos);
+						}
+					});
 				}
 			}
 		}
