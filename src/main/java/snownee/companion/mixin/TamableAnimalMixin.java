@@ -32,9 +32,13 @@ public class TamableAnimalMixin implements CompanionTamableAnimal {
 		}
 		companion$lastTeleportation = time;
 		entity.setTarget(null);
-		Hooks.teleportWithRandomOffset(entity, owner.blockPosition().relative(owner.getDirection().getOpposite(), 3), null).ifPresent(vec -> {
-			entity.teleportTo(vec.x, vec.y, vec.z);
-		});
+		Hooks.teleportWithRandomOffset(
+						entity,
+						owner.level(),
+						owner.blockPosition().relative(owner.getDirection().getOpposite(), 3),
+						null,
+						owner)
+				.ifPresent(vec -> entity.teleportTo(vec.x, vec.y, vec.z));
 	}
 
 }

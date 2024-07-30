@@ -12,7 +12,7 @@ description = "Protect your pets."
 
 [[dependencies.companion]]
 modId = "kiwi"
-mandatory = false
+mandatory = true
 versionRange = "[11.8.15,)"
 ordering = "NONE"
 side = "BOTH"
