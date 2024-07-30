@@ -4,6 +4,6 @@ import net.minecraft.world.damagesource.DamageSource;
 
 public interface CompanionTamableAnimal {
 
-	void tryTeleportToOwner(DamageSource damageSource);
+	void companion$tryTeleportToOwner(DamageSource damageSource);
 
 }
