@@ -29,7 +29,7 @@ public class FollowOwnerGoalMixin {
 	@Inject(at = @At("TAIL"), method = "teleportToOwner")
 	private void companion_teleportToOwner(CallbackInfo ci) {
 		if (CompanionCommonConfig.petForceTeleportingIfFollowFailed && owner != null) {
-			Hooks.teleportWithRandomOffset(tamable, owner.blockPosition(), canFly).ifPresent(vec -> {
+			Hooks.teleportWithRandomOffset(tamable, owner.level(), owner.blockPosition(), canFly, owner).ifPresent(vec -> {
 				tamable.teleportTo(vec.x, vec.y, vec.z);
 			});
 		}

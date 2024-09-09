@@ -47,6 +47,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.companion.mixin.EntityAccess;
 import snownee.companion.mixin.MobAccess;
@@ -117,8 +118,7 @@ public class Hooks {
 			if (entity.isPassenger() || !entity.canChangeDimensions()) {
 				continue;
 			}
-			if (entity instanceof Mob) {
-				Mob mob = (Mob) entity;
+			if (entity instanceof Mob mob) {
 				if (mob.isLeashed()) {
 					if (mob.getLeashHolder() == player) {
 						entities.add(mob);
@@ -135,29 +135,38 @@ public class Hooks {
 		return entities;
 	}
 
-	public static Optional<Vec3> teleportWithRandomOffset(LivingEntity entity, BlockPos blockPos, Boolean canFly) {
+	public static Optional<Vec3> teleportWithRandomOffset(
+			LivingEntity entity,
+			Level level,
+			BlockPos blockPos,
+			Boolean canFly,
+			Entity avoidColliding) {
 		boolean _canFly = canFly != null ? canFly : entity instanceof FlyingAnimal;
-		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(entity, blockPos, _canFly);
+		AABB box = avoidColliding.getBoundingBox();
+		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(entity, blockPos, _canFly, box);
 		if (vec3.isPresent() || _canFly) {
 			return vec3;
 		}
-		Level level = entity.level();
 		BlockPos heightmapPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockPos);
 		if (heightmapPos.getY() < blockPos.getY()) {
-			return teleportWithRandomOffsetInternal(entity, heightmapPos, false);
+			return teleportWithRandomOffsetInternal(entity, heightmapPos, false, box);
 		}
 		MutableBlockPos mutable = blockPos.mutable().move(Direction.DOWN);
 		for (int i = 0; i < 25; ++i) {
 			mutable.move(Direction.DOWN);
 			BlockState blockState = level.getBlockState(mutable);
 			if (Heightmap.Types.MOTION_BLOCKING.isOpaque().test(blockState)) {
-				return teleportWithRandomOffsetInternal(entity, mutable, false);
+				return teleportWithRandomOffsetInternal(entity, mutable, false, box);
 			}
 		}
 		return Optional.empty();
 	}
 
-	private static Optional<Vec3> teleportWithRandomOffsetInternal(LivingEntity entity, BlockPos blockPos, boolean canFly) {
+	private static Optional<Vec3> teleportWithRandomOffsetInternal(
+			LivingEntity entity,
+			BlockPos blockPos,
+			boolean canFly,
+			AABB avoidColliding) {
 		if (blockPos.distToCenterSqr(entity.position()) < 16) {
 			return Optional.empty();
 		}
@@ -165,10 +174,13 @@ public class Hooks {
 		MutableBlockPos pos = new MutableBlockPos();
 		for (int i = 0; i < 20; ++i) {
 			int j = randomIntInclusive(random, -3, 3);
-			int k = randomIntInclusive(random, -1, 1);
 			int l = randomIntInclusive(random, -3, 3);
+			if (Math.abs(j) + Math.abs(l) < 2) {
+				continue;
+			}
+			int k = randomIntInclusive(random, -1, 1);
 			pos.set(blockPos.getX() + j, blockPos.getY() + k, blockPos.getZ() + l);
-			if (canTeleportTo(entity, pos, canFly)) {
+			if (canTeleportTo(entity, pos, canFly, avoidColliding)) {
 				return Optional.of(new Vec3(pos.getX() + .5, pos.getY(), pos.getZ() + .5));
 			}
 		}
@@ -179,7 +191,7 @@ public class Hooks {
 		return random.nextInt(j - i + 1) + i;
 	}
 
-	private static boolean canTeleportTo(LivingEntity entity, BlockPos blockPos, boolean canFly) {
+	private static boolean canTeleportTo(LivingEntity entity, BlockPos blockPos, boolean canFly, AABB avoidColliding) {
 		MutableBlockPos mutable = blockPos.mutable();
 		BlockPathTypes blockPathType = WalkNodeEvaluator.getBlockPathTypeStatic(entity.level(), mutable);
 		if (blockPathType == BlockPathTypes.OPEN && !canFly) {
@@ -208,9 +220,8 @@ public class Hooks {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
-		return entity.level().noCollision(
-				entity,
-				entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5));
+		AABB moved = entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5);
+		return !moved.intersects(avoidColliding) && entity.level().noCollision(entity, moved);
 	}
 
 	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
@@ -230,12 +241,12 @@ public class Hooks {
 			if (entityAccess instanceof Mob entity) {
 				Player owner = getEntityOwner(entity);
 				if (shouldFollowOwner(owner, entity)) {
-					BlockPos pos = owner.blockPosition();
 					if (owner.level() != entity.level()) {
 						continue;
 						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
-					teleportWithRandomOffset(entity, pos, null).ifPresentOrElse(vec -> {
+					BlockPos pos = owner.blockPosition();
+					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(vec -> {
 						entity.teleportTo(vec.x, vec.y, vec.z);
 					}, () -> {
 						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
