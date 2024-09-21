@@ -17,6 +17,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -251,7 +252,13 @@ public class Hooks {
 					}, () -> {
 						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
 								CompanionCommonConfig.logIfTeleportingFailed) {
-							Companion.LOGGER.warn("Failed to teleport {} to {}", entity, pos);
+							Companion.LOGGER.warn(
+									"Failed to teleport {}({}) from {} {} to {}",
+									entity.getDisplayName().getString(),
+									BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
+									entity.level().dimension().location(),
+									entity.blockPosition().toShortString(),
+									pos.toShortString());
 						}
 					});
 				}
