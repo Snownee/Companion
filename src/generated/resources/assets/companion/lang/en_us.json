@@ -7,8 +7,8 @@
   "companion.config.follow.logIfTeleportingFailed.desc": "Log to console if a pet failed to teleport when the chunk was unloaded",
   "companion.config.follow.petForceTeleportingIfFollowFailed": "Pet Force Teleporting If Follow Failed",
   "companion.config.follow.petForceTeleportingIfFollowFailed.desc": "",
-  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Pet Wont Change Dimension Unless Owner Is Nearby Radius",
-  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Player Nearby Change Dimension Radius",
+  "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "Pet Won't Change Dimension Unless Owner Is Nearby",
   "companion.config.follow.portalMaxTeleportedPets": "Portal Max Teleported Pets",
   "companion.config.follow.portalMaxTeleportedPets.desc": "Max number of animals that will be teleported with you\n-1 = Use the value of maxEntityCramming gamerule",
   "companion.config.follow.portalTeleportingPets": "Portal Teleporting Pets",
@@ -36,5 +36,7 @@
   "gamerule.companion:alwaysTeleportHorses": "Always teleport horse",
   "gamerule.companion:alwaysTeleportHorses.description": "Always teleports your horses if they are too far from you. (by Companion mod)",
   "gamerule.companion:petFriendlyFire": "Pet friendly fire",
-  "gamerule.companion:petFriendlyFire.description": "Pet friendly fire. (by Companion mod)"
+  "gamerule.companion:petFriendlyFire.description": "Pet friendly fire. (by Companion mod)",
+  "modmenu.descriptionTranslation.companion": "Protect your pets.",
+  "modmenu.nameTranslation.companion": "Companion"
 }

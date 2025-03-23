@@ -64,10 +64,9 @@ public class EntityMixin {
 
 	@Inject(at = @At("HEAD"), method = "isAlliedTo(Lnet/minecraft/world/entity/Entity;)Z", cancellable = true)
 	private void companion_isAlliedTo(Entity entity, CallbackInfoReturnable<Boolean> ci) {
-		if (CompanionCommonConfig.betterSweepingEdgeEffect && (Object) this instanceof Player) {
+		if (CompanionCommonConfig.betterSweepingEdgeEffect && (Object) this instanceof Player player) {
 			Player owner = Hooks.getEntityOwner(entity);
-			Player self = (Player) (Object) this;
-			if (Objects.equals(self, owner)) {
+			if (Objects.equals(player, owner)) {
 				ci.setReturnValue(true);
 			}
 		}

@@ -2,12 +2,11 @@
 	"required": true,
 	"package": "snownee.companion.mixin",
 	"plugin": "snownee.companion.mixin.MixinPlugin",
-	"compatibilityLevel": "JAVA_16",
+	"compatibilityLevel": "JAVA_21",
 	"refmap": "companion.refmap.json",
 	"mixins": [
-		"EntityAccess",
+		"EndPortalBlockMixin",
 		"EntityMixin",
-		"FollowOwnerGoalMixin",
 		"LivingEntityMixin",
 		"MobAccess",
 		"MobMixin",
@@ -17,7 +16,7 @@
 		"PlayerMixin",
 		"PlayerMixinFailsafe",
 		"ServerPlayerMixin",
-		"ServerPlayerMixinPortingLib",
+		"TamableAnimalAccess",
 		"TamableAnimalMixin",
 		"TargetGoalMixin"
 	],

@@ -12,10 +12,9 @@ import com.lizin5ths.indypets.util.IndyPetsUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import net.fabricmc.fabric.api.dimension.v1.FabricDimensions;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockPos.MutableBlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -43,22 +42,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
+import net.minecraft.world.level.pathfinder.PathfindingContext;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
-import net.minecraft.world.level.portal.PortalInfo;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import snownee.companion.mixin.EntityAccess;
 import snownee.companion.mixin.MobAccess;
+import snownee.companion.mixin.TamableAnimalAccess;
+import snownee.kiwi.util.NotNullByDefault;
 
+@NotNullByDefault
 public class Hooks {
 
-	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
-	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(
+	public static final TagKey<Item> CHARGED_RANGED_WEAPONS = TagKey.create(
 			Registries.ITEM,
-			new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
+			ResourceLocation.fromNamespaceAndPath(Companion.ID, "charged_ranged_weapons"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 	public static boolean traveling;
 	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
@@ -81,31 +84,29 @@ public class Hooks {
 		boolean nether = from.dimension() == Level.NETHER || to.dimension() == Level.NETHER;
 		BlockPos portalPos = null;
 		if (nether) {
-			portalPos = ((EntityAccess) player).getPortalEntrancePos();
+			if (player.portalProcess != null) {
+				portalPos = player.portalProcess.getEntryPosition();
+			}
+
 			if (portalPos == null) {
 				return;
 			}
 		}
-		for (Entity entity : getAllPets(from, player)) {
-			if (nether) {
-				((EntityAccess) entity).setPortalCooldown(0);
-				((EntityAccess) entity).callHandleInsidePortal(portalPos);
-			}
-			entity.setPortalCooldown();
-			PortalInfo portal = CompanionTeleporter.INSTANCE.getPortalInfo(entity, to, null);
-			if (portal != null) {
-				FabricDimensions.teleport(entity, to, portal);
-			}
 
-			// this is buggy... position change will not be sync to the client properly..
-			// i guess an extra packet is needed
-			//			if (entity == null)
-			//				continue;
-			//			teleportWithRandomOffset(entity, player.blockPosition());
+		for (Entity entity : getAllPets(from, to, player)) {
+			if (nether) {
+				entity.setPortalCooldown(0);
+				entity.setAsInsidePortal((NetherPortalBlock) Blocks.NETHER_PORTAL, portalPos);
+			}
+			if (entity instanceof Mob mob) {
+				entity.setPortalCooldown();
+				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, player.blockPosition(), false, player).orElseGet(player::position);
+				entity.changeDimension(new DimensionTransition(to, dest, Vec3.ZERO, 0.0F, 0.0F, DimensionTransition.DO_NOTHING));
+			}
 		}
 	}
 
-	public static List<Entity> getAllPets(ServerLevel level, ServerPlayer player) {
+	public static List<Entity> getAllPets(ServerLevel level, ServerLevel to, ServerPlayer player) {
 		int max = CompanionCommonConfig.portalMaxTeleportedPets;
 		if (max == -1) {
 			max = level.getGameRules().getInt(GameRules.RULE_MAX_ENTITY_CRAMMING);
@@ -116,7 +117,7 @@ public class Hooks {
 			if (entities.size() >= max) {
 				break;
 			}
-			if (entity.isPassenger() || !entity.canChangeDimensions()) {
+			if (entity.isPassenger() || !entity.canChangeDimensions(level, to)) {
 				continue;
 			}
 			if (entity instanceof Mob mob) {
@@ -128,7 +129,6 @@ public class Hooks {
 				}
 				if (Objects.equals(player.getUUID(), getEntityOwnerUUID(mob)) && shouldFollowOwner(player, mob)) {
 					entities.add(mob);
-					continue;
 				}
 			}
 		}
@@ -137,13 +137,15 @@ public class Hooks {
 	}
 
 	public static Optional<Vec3> teleportWithRandomOffset(
-			LivingEntity entity,
+			Mob entity,
 			Level level,
 			BlockPos blockPos,
-			Boolean canFly,
-			Entity avoidColliding) {
-		boolean _canFly = canFly != null ? canFly : entity instanceof FlyingAnimal;
-		AABB box = avoidColliding.getBoundingBox();
+			@Nullable Boolean canFly,
+			@Nullable Entity avoidColliding) {
+		boolean _canFly = canFly != null ?
+				canFly :
+				entity instanceof FlyingAnimal || entity instanceof TamableAnimalAccess tamable && tamable.callCanFlyToOwner();
+		AABB box = avoidColliding == null ? null : avoidColliding.getBoundingBox();
 		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(entity, level, blockPos, _canFly, box);
 		if (vec3.isPresent() || _canFly) {
 			return vec3;
@@ -152,7 +154,7 @@ public class Hooks {
 		if (heightmapPos.getY() < blockPos.getY()) {
 			return teleportWithRandomOffsetInternal(entity, level, heightmapPos, false, box);
 		}
-		MutableBlockPos mutable = blockPos.mutable().move(Direction.DOWN);
+		BlockPos.MutableBlockPos mutable = blockPos.mutable().move(Direction.DOWN);
 		for (int i = 0; i < 25; ++i) {
 			mutable.move(Direction.DOWN);
 			BlockState blockState = level.getBlockState(mutable);
@@ -164,16 +166,16 @@ public class Hooks {
 	}
 
 	private static Optional<Vec3> teleportWithRandomOffsetInternal(
-			LivingEntity entity,
+			Mob entity,
 			Level level,
 			BlockPos blockPos,
 			boolean canFly,
-			AABB avoidColliding) {
+			@Nullable AABB avoidColliding) {
 		if (entity.level() == level && blockPos.distToCenterSqr(entity.position()) < 16) {
 			return Optional.empty();
 		}
 		RandomSource random = entity.getRandom();
-		MutableBlockPos pos = new MutableBlockPos();
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (int i = 0; i < 25; ++i) {
 			int j = randomIntInclusive(random, -3, 3);
 			int l = randomIntInclusive(random, -3, 3);
@@ -193,16 +195,17 @@ public class Hooks {
 		return random.nextInt(j - i + 1) + i;
 	}
 
-	private static boolean canTeleportTo(LivingEntity entity, Level level, BlockPos blockPos, boolean canFly, AABB avoidColliding) {
-		MutableBlockPos mutable = blockPos.mutable();
-		BlockPathTypes blockPathType = WalkNodeEvaluator.getBlockPathTypeStatic(level, mutable);
-		if (blockPathType == BlockPathTypes.OPEN && !canFly) {
+	private static boolean canTeleportTo(Mob entity, Level level, BlockPos blockPos, boolean canFly, @Nullable AABB avoidColliding) {
+		BlockPos.MutableBlockPos mutable = blockPos.mutable();
+		PathfindingContext pathfindingContext = new PathfindingContext(level, entity);
+		PathType blockPathType = WalkNodeEvaluator.getPathTypeStatic(pathfindingContext, mutable);
+		if (blockPathType == PathType.OPEN && !canFly) {
 			return false;
 		}
 		if (entity instanceof PathfinderMob pathfinderMob) {
 			float f = pathfinderMob.getWalkTargetValue(blockPos);
-			if (blockPathType == BlockPathTypes.WATER) {
-				if (f > BlockPathTypes.WATER.getMalus()) {
+			if (blockPathType == PathType.WATER) {
+				if (f > PathType.WATER.getMalus()) {
 					return false;
 				}
 				mutable.move(Direction.UP);
@@ -210,15 +213,14 @@ public class Hooks {
 				if (!aboveState.isAir()) {
 					return false;
 				}
-			} else if (blockPathType == BlockPathTypes.LAVA || blockPathType == BlockPathTypes.DAMAGE_FIRE ||
-					blockPathType == BlockPathTypes.DANGER_FIRE) {
+			} else if (blockPathType == PathType.LAVA || blockPathType == PathType.DAMAGE_FIRE || blockPathType == PathType.DANGER_FIRE) {
 				if (!entity.fireImmune()) {
 					return false;
 				}
-			} else if (blockPathType != BlockPathTypes.WALKABLE && blockPathType != BlockPathTypes.OPEN) {
+			} else if (blockPathType != PathType.WALKABLE && blockPathType != PathType.OPEN) {
 				return false;
 			}
-		} else if (blockPathType != BlockPathTypes.WALKABLE && blockPathType != BlockPathTypes.OPEN) {
+		} else if (blockPathType != PathType.WALKABLE && blockPathType != PathType.OPEN) {
 			return false;
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
@@ -245,29 +247,27 @@ public class Hooks {
 				if (shouldFollowOwner(owner, entity)) {
 					if (owner.level() != entity.level()) {
 						continue;
-						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
 					BlockPos pos = owner.blockPosition();
-					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(vec -> {
-						entity.teleportTo(vec.x, vec.y, vec.z);
-					}, () -> {
-						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
-								CompanionCommonConfig.logIfTeleportingFailed) {
-							Companion.LOGGER.warn(
-									"Failed to teleport {}({}) from {} {} to {}",
-									entity.getDisplayName().getString(),
-									BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
-									entity.level().dimension().location(),
-									entity.blockPosition().toShortString(),
-									pos.toShortString());
-						}
-					});
+					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(
+							vec -> entity.teleportTo(vec.x, vec.y, vec.z), () -> {
+								if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
+										CompanionCommonConfig.logIfTeleportingFailed) {
+									Companion.LOGGER.warn(
+											"Failed to teleport {}({}) from {} {} to {}",
+											Objects.requireNonNull(entity.getDisplayName()).getString(),
+											BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
+											entity.level().dimension().location(),
+											entity.blockPosition().toShortString(),
+											pos.toShortString());
+								}
+							});
 				}
 			}
 		}
 	}
 
-	public static boolean shouldFollowOwner(LivingEntity owner, Mob pet) {
+	public static boolean shouldFollowOwner(@Nullable LivingEntity owner, Mob pet) {
 		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
 			return false;
 		}
@@ -284,21 +284,22 @@ public class Hooks {
 		if (pet instanceof AbstractHorse) {
 			return pet.level().getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
 		}
-		return FOLLOWABLE_CACHE.computeIfAbsent(pet.getClass(), $ -> {
-			for (WrappedGoal goal : ((MobAccess) pet).getGoalSelector().getAvailableGoals()) {
-				if (goal.getGoal() instanceof FollowOwnerGoal) {
-					return true;
-				}
-			}
-			return false;
-		});
+		return FOLLOWABLE_CACHE.computeIfAbsent(
+				pet.getClass(), $ -> {
+					for (WrappedGoal goal : ((MobAccess) pet).getGoalSelector().getAvailableGoals()) {
+						if (goal.getGoal() instanceof FollowOwnerGoal) {
+							return true;
+						}
+					}
+					return false;
+				});
 	}
 
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
-		if (player.isHolding($ -> $.is(RANGED_WEAPON))) {
+		if (player.isHolding($ -> $.is(ConventionalItemTags.RANGED_WEAPON_TOOLS))) {
 			ItemStack main = player.getMainHandItem();
 			ItemStack off = player.getOffhandItem();
-			ItemStack stack = main.is(RANGED_WEAPON) ? main : off;
+			ItemStack stack = main.is(ConventionalItemTags.RANGED_WEAPON_TOOLS) ? main : off;
 			if (stack.getItem() instanceof CrossbowItem) {
 				if (CrossbowItem.isCharged(stack)) {
 					return true;
@@ -307,7 +308,7 @@ public class Hooks {
 				return true;
 			}
 		}
-		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 && player.isHolding($ -> $.is(CHARGED_RANGED_WEAPON))) {
+		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 && player.isHolding($ -> $.is(CHARGED_RANGED_WEAPONS))) {
 			ItemStack stack = player.getUseItem();
 			UseAnim anim = stack.getUseAnimation();
 			if (anim == UseAnim.BOW || anim == UseAnim.CROSSBOW || anim == UseAnim.SPEAR) {
@@ -331,8 +332,8 @@ public class Hooks {
 
 	@Nullable
 	public static UUID getEntityOwnerUUID(Entity entity) {
-		if (entity instanceof OwnableEntity) {
-			return ((OwnableEntity) entity).getOwnerUUID();
+		if (entity instanceof OwnableEntity ownableEntity) {
+			return ownableEntity.getOwnerUUID();
 		}
 		return null;
 	}
