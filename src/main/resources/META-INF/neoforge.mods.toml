@@ -1,0 +1,22 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "ARR"
+
+[[mods]]
+modId = "companion"
+version = "${file.jarVersion}"
+displayName = "Companion"
+authors = "Snownee"
+displayURL = "https://www.curseforge.com/minecraft/mc-mods/companion"
+description = "Protect your pets."
+credits = "SettingDust"
+
+[[dependencies.companion]]
+modId = "kiwi"
+versionRange = "[15,)"
+
+[[mixins]]
+config = "companion.mixins.json"
+
+[modproperties.lightingwand]
+catalogueItemIcon = "bone" #Support for Catalogue mod

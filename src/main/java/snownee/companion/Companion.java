@@ -8,7 +8,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.world.level.GameRules;
-import snownee.kiwi.Mod;
+import net.neoforged.fml.common.Mod;
 
 @Mod(Companion.ID)
 public class Companion implements ModInitializer {

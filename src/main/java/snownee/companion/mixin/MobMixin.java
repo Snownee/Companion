@@ -30,15 +30,14 @@ public class MobMixin {
 		}
 		Mob entity = (Mob) (Object) this;
 		boolean handled = true;
-		if (entity instanceof TamableAnimal tamable) {
-			tamable.tame(player);
-		} else if (entity instanceof AbstractHorse horse) {
-			horse.tameWithName(player);
-			horse.equipSaddle(new ItemStack(Items.SADDLE), null);
-		} else if (entity instanceof Chicken && player instanceof ServerPlayer serverPlayer) {
-			serverPlayer.seenCredits = false;
-		} else {
-			handled = false;
+		switch (entity) {
+			case TamableAnimal tamable -> tamable.tame(player);
+			case AbstractHorse horse -> {
+				horse.tameWithName(player);
+				horse.equipSaddle(new ItemStack(Items.SADDLE), null);
+			}
+			case Chicken ignored when player instanceof ServerPlayer serverPlayer -> serverPlayer.seenCredits = false;
+			case null, default -> handled = false;
 		}
 		if (handled) {
 			cir.setReturnValue(InteractionResult.sidedSuccess(player.level().isClientSide));
