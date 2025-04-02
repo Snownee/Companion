@@ -34,9 +34,18 @@ neoForge {
     runs {
         client {
             client()
+            ideName = "Run ${project.mod_id} - Client"
         }
         server {
             server()
+            ideName = "Run ${project.mod_id} - Server"
+        }
+        data {
+            data()
+            ideName = "Run ${project.mod_id} - Data"
+            programArguments.addAll "--mod", "${mod_id}",
+                    "--output", file('src/generated/resources/').getAbsolutePath(),
+                    "--existing", file('src/main/resources/').getAbsolutePath()
         }
     }
 }
@@ -61,7 +70,6 @@ repositories {
 dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${project.fabric_version}"
-
 
     api("me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_config_version}")
 
