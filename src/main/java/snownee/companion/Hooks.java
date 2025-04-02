@@ -8,10 +8,12 @@ import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lizin5ths.indypets.util.Independence;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,6 +64,7 @@ public class Hooks {
 			ResourceLocation.fromNamespaceAndPath(Companion.ID, "charged_ranged_weapons"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 	public static boolean traveling;
+	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
 
 	// Here is a bug that tamed wolf reset their health when it travels through portal.
 	// Good job mojang
@@ -271,6 +274,11 @@ public class Hooks {
 		if (pet instanceof TamableAnimal animal) {
 			if (animal.isOrderedToSit()) {
 				return false;
+			}
+			if (indyPets) {
+				if (((Independence) animal).indypets$isIndependent()) {
+					return false;
+				}
 			}
 		}
 		if (pet instanceof AbstractHorse) {
