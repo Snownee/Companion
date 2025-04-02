@@ -3,7 +3,6 @@
 	"package": "snownee.companion.mixin",
 	"plugin": "snownee.companion.mixin.MixinPlugin",
 	"compatibilityLevel": "JAVA_21",
-	"refmap": "companion.refmap.json",
 	"mixins": [
 		"EndPortalBlockMixin",
 		"EntityMixin",

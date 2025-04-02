@@ -26,7 +26,7 @@ public class CompanionDataGen implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider provider) {
-			getOrCreateTagBuilder(Hooks.CHARGED_RANGED_WEAPONS).add(Items.TRIDENT).forceAddTag(ConventionalItemTags.CROSSBOW_TOOLS);
+			tag(Hooks.CHARGED_RANGED_WEAPONS).add(Items.TRIDENT).forceAddTag(ConventionalItemTags.CROSSBOW_TOOLS);
 		}
 	}
 }

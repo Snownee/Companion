@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.lizin5ths.indypets.util.IndyPetsUtil;
+import com.lizin5ths.indypets.util.Independence;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -276,7 +276,7 @@ public class Hooks {
 				return false;
 			}
 			if (indyPets) {
-				if (IndyPetsUtil.isIndependent(animal)) {
+				if (((Independence) animal).indypets$isIndependent()) {
 					return false;
 				}
 			}
