@@ -76,7 +76,7 @@ dependencies {
     // https://modrinth.com/mod/kiwi/versions
     implementation(annotationProcessor("maven.modrinth:kiwi:15.5.0+neoforge"))
 
-    implementation "maven.modrinth:indypets:1.4.7-1.21"
+    compileOnly "maven.modrinth:indypets:1.4.7-1.21"
 }
 
 tasks.withType(JavaCompile).configureEach {
