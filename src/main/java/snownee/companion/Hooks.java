@@ -12,8 +12,6 @@ import com.lizin5ths.indypets.util.Independence;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -54,6 +52,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.companion.mixin.MobAccess;
 import snownee.companion.mixin.TamableAnimalAccess;
+import snownee.kiwi.loader.Platform;
 import snownee.kiwi.util.NotNullByDefault;
 
 @NotNullByDefault
@@ -64,7 +63,7 @@ public class Hooks {
 			ResourceLocation.fromNamespaceAndPath(Companion.ID, "charged_ranged_weapons"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 	public static boolean traveling;
-	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
+	public static boolean indyPets = Platform.isModLoaded("indypets");
 
 	// Here is a bug that tamed wolf reset their health when it travels through portal.
 	// Good job mojang
@@ -296,10 +295,10 @@ public class Hooks {
 	}
 
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
-		if (player.isHolding($ -> $.is(ConventionalItemTags.RANGED_WEAPON_TOOLS))) {
+		if (player.isHolding(CommonProxy::isRangedWeapon)) {
 			ItemStack main = player.getMainHandItem();
 			ItemStack off = player.getOffhandItem();
-			ItemStack stack = main.is(ConventionalItemTags.RANGED_WEAPON_TOOLS) ? main : off;
+			ItemStack stack = CommonProxy.isRangedWeapon(main) ? main : off;
 			if (stack.getItem() instanceof CrossbowItem) {
 				if (CrossbowItem.isCharged(stack)) {
 					return true;
