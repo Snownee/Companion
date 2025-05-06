@@ -24,6 +24,10 @@ public class Companion implements ModInitializer {
 			"companion:alwaysTeleportHorses",
 			GameRules.Category.PLAYER,
 			GameRuleFactory.createBooleanRule(false));
+	public static final GameRules.Key<GameRules.BooleanValue> IMMORTAL_PETS = GameRuleRegistry.register(
+			"immortalPets",
+			GameRules.Category.PLAYER,
+			GameRuleFactory.createBooleanRule(false));
 
 	@Override
 	public void onInitialize() {
