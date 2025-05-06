@@ -17,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
@@ -228,10 +229,18 @@ public class Hooks {
 	}
 
 	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
+		if (isImmortalDying(pet)) {
+			return false;
+		}
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
 			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
 		}
 		return true;
+	}
+
+	public static boolean isImmortalDying(LivingEntity entity) {
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
+				Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -323,10 +332,11 @@ public class Hooks {
 		if (ownerUUID == null) {
 			return null;
 		}
-		if (entity.level().getServer() == null) {
+		MinecraftServer server = entity.level().getServer();
+		if (server == null) {
 			return entity.level().getPlayerByUUID(ownerUUID);
 		}
-		return entity.level().getServer().getPlayerList().getPlayer(ownerUUID);
+		return server.getPlayerList().getPlayer(ownerUUID);
 	}
 
 	@Nullable

@@ -35,8 +35,10 @@
   "companion.config.shoulderPets.smartDismount.desc": "Jump in place to dismount shoulder pets",
   "gamerule.companion:alwaysTeleportHorses": "Always teleport horse",
   "gamerule.companion:alwaysTeleportHorses.description": "Always teleports your horses if they are too far from you. (by Companion mod)",
+  "gamerule.companion:immortalPets": "Immortal pets",
+  "gamerule.companion:immortalPets.description": "Pets never die. But their speed will be very slow at extremely low health. (by Companion mod)",
   "gamerule.companion:petFriendlyFire": "Pet friendly fire",
-  "gamerule.companion:petFriendlyFire.description": "Pet friendly fire. (by Companion mod)",
+  "gamerule.companion:petFriendlyFire.description": "Pets can be hurt by players in your team. (by Companion mod)",
   "modmenu.descriptionTranslation.companion": "Protect your pets.",
   "modmenu.nameTranslation.companion": "Companion"
 }
