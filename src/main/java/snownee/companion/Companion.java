@@ -6,7 +6,6 @@ import com.mojang.logging.LogUtils;
 
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.fml.common.Mod;
-import snownee.companion.mixin.BooleanValueAccess;
 
 @Mod(Companion.ID)
 public class Companion {
@@ -14,12 +13,16 @@ public class Companion {
 
 	public static final Logger LOGGER = LogUtils.getLogger();
 
-	public static final GameRules.Key<GameRules.BooleanValue> PET_FRIENDLY_FIRE = GameRules.register(
-			"companion:petFriendlyFire",
+	public static final GameRules.Key<GameRules.BooleanValue> PET_FRIENDLY_FIRE = CommonProxy.registerRule(
+			"petFriendlyFire",
 			GameRules.Category.PLAYER,
-			BooleanValueAccess.callCreate(true));
-	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = GameRules.register(
-			"companion:alwaysTeleportHorses",
+			true);
+	public static final GameRules.Key<GameRules.BooleanValue> IMMORTAL_PETS = CommonProxy.registerRule(
+			"immortalPets",
 			GameRules.Category.PLAYER,
-			BooleanValueAccess.callCreate(false));
+			false);
+	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = CommonProxy.registerRule(
+			"alwaysTeleportHorses",
+			GameRules.Category.PLAYER,
+			false);
 }
