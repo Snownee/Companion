@@ -15,6 +15,10 @@ public class Companion {
 			"petFriendlyFire",
 			GameRules.Category.PLAYER,
 			true);
+	public static final GameRules.Key<GameRules.BooleanValue> IMMORTAL_PETS = CommonProxy.registerRule(
+			"immortalPets",
+			GameRules.Category.PLAYER,
+			false);
 	public static final GameRules.Key<GameRules.BooleanValue> ALWAYS_TELEPORT_HORSES = CommonProxy.registerRule(
 			"alwaysTeleportHorses",
 			GameRules.Category.PLAYER,

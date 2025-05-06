@@ -14,6 +14,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -37,6 +38,7 @@ public class EntityMixin {
 			}
 			Vec3 now = entity.position();
 			player.companion$setJumpPos(null);
+			//noinspection SuspiciousNameCombination
 			if (Mth.equal(past.x, now.x) && Mth.equal(past.y, now.y) && Mth.equal(past.z, now.z)) {
 				player.companion$removeShoulderEntities();
 			}
@@ -62,6 +64,7 @@ public class EntityMixin {
 		}
 	}
 
+	@SuppressWarnings("ConstantValue")
 	@Inject(at = @At("HEAD"), method = "isAlliedTo(Lnet/minecraft/world/entity/Entity;)Z", cancellable = true)
 	private void companion_isAlliedTo(Entity entity, CallbackInfoReturnable<Boolean> ci) {
 		if (CompanionCommonConfig.betterSweepingEdgeEffect && (Object) this instanceof Player player) {
@@ -80,6 +83,14 @@ public class EntityMixin {
 			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
 				ci.setReturnValue(true);
 			}
+		}
+	}
+
+	@SuppressWarnings("ConstantValue")
+	@Inject(at = @At("HEAD"), method = "isInvulnerable", cancellable = true)
+	private void companion_isInvulnerable(CallbackInfoReturnable<Boolean> cir) {
+		if ((Object) this instanceof LivingEntity self && Hooks.isImmortalDying(self)) {
+			cir.setReturnValue(true);
 		}
 	}
 
