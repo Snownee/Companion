@@ -38,7 +38,6 @@ public class EntityMixin {
 			}
 			Vec3 now = entity.position();
 			player.companion$setJumpPos(null);
-			//noinspection SuspiciousNameCombination
 			if (Mth.equal(past.x, now.x) && Mth.equal(past.y, now.y) && Mth.equal(past.z, now.z)) {
 				player.companion$removeShoulderEntities();
 			}
