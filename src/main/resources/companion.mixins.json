@@ -6,17 +6,17 @@
 	"mixins": [
 		"EndPortalBlockMixin",
 		"EntityMixin",
+		"GoalSelectorMixin",
 		"LivingEntityMixin",
 		"MobAccess",
 		"MobMixin",
-		"OwnerHurtByTargetGoalMixin",
-		"OwnerHurtTargetGoalMixin",
 		"PersistentEntitySectionManagerMixin",
 		"PlayerMixin",
 		"PlayerMixinFailsafe",
 		"ServerPlayerMixin",
 		"TamableAnimalAccess",
 		"TamableAnimalMixin",
+		"TargetGoalAccess",
 		"TargetGoalMixin"
 	],
 	"injectors": {

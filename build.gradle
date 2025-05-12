@@ -75,6 +75,8 @@ dependencies {
 
     // https://modrinth.com/mod/kiwi/versions
     implementation(annotationProcessor("maven.modrinth:kiwi:15.5.0+neoforge"))
+    // https://modrinth.com/mod/jade/versions
+    implementation "maven.modrinth:jade:15.10.0+neoforge"
 
     compileOnly "maven.modrinth:indypets:1.4.7-1.21"
 }

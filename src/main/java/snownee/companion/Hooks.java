@@ -30,6 +30,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -228,12 +229,15 @@ public class Hooks {
 		return !moved.intersects(avoidColliding) && level.noCollision(entity, moved);
 	}
 
-	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
+	public static boolean wantsToAttack(TamableAnimal pet, @Nullable LivingEntity enemy) {
+		if (!pet.isTame()) {
+			return true;
+		}
 		if (isImmortalDying(pet)) {
 			return false;
 		}
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
-			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
+			return enemy != null && !(enemy instanceof Enemy || enemy instanceof IronGolem);
 		}
 		return true;
 	}
@@ -347,4 +351,13 @@ public class Hooks {
 		return null;
 	}
 
+	public static void stopAttacking(Mob mob) {
+		mob.setTarget(null);
+		for (WrappedGoal goal : mob.targetSelector.getAvailableGoals()) {
+			goal.stop();
+		}
+		if (mob.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
+			mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
+		}
+	}
 }
