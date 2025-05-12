@@ -43,12 +43,13 @@ dependencies {
 
     modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
     modImplementation "maven.modrinth:kiwi:${project.kiwi_version}+fabric"
-	annotationProcessor "maven.modrinth:kiwi:${project.kiwi_version}+fabric"
+    annotationProcessor "maven.modrinth:kiwi:${project.kiwi_version}+fabric"
     modImplementation "maven.modrinth:indypets:1.4.3-1.21"
 }
 
 loom {
     mixin {
+        accessWidenerPath = file("src/main/resources/${project.mod_id}.accesswidener")
         defaultRefmapName = "${project.mod_id}.refmap.json"
     }
     runs {

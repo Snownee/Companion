@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
@@ -34,6 +35,13 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 			return;
 		}
 		LivingEntity owner = getOwner();
+		if (owner == null) {
+			return;
+		}
+		Hooks.stopAttacking(this);
+		if (damageSource.getEntity() instanceof Mob attacker) {
+			Hooks.stopAttacking(attacker);
+		}
 		if (owner == damageSource.getEntity() || !Hooks.shouldFollowOwner(owner, this)) {
 			return;
 		}
@@ -43,7 +51,6 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 			return;
 		}
 		companion$lastTeleportation = time;
-		setTarget(null);
 		((TamableAnimalAccess) this).callTeleportToAroundBlockPos(owner.blockPosition().relative(owner.getDirection().getOpposite(), 3));
 	}
 
