@@ -15,7 +15,7 @@
 	"license": "ARR",
 	"entrypoints": {
 		"main": [
-			"snownee.companion.Companion"
+			"snownee.companion.CommonProxy"
 		],
 		"fabric-datagen": [
 			"snownee.companion.CompanionDataGen"
@@ -24,6 +24,7 @@
 	"mixins": [
 		"companion.mixins.json"
 	],
+	"accessWidener": "companion.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.15",
 		"fabric-api": ">=0.90",
