@@ -3,18 +3,14 @@ package snownee.companion.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.level.Level;
-import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionTamableAnimal;
 import snownee.companion.Hooks;
 
@@ -50,17 +46,12 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 			return;
 		}
 		companion$lastTeleportation = time;
-		((TamableAnimalAccess) this).callTeleportToAroundBlockPos(owner.blockPosition().relative(owner.getDirection().getOpposite(), 3));
-	}
-
-	@WrapMethod(method = "teleportToAroundBlockPos")
-	private void companion_teleportToAroundBlockPos(BlockPos pos, Operation<Void> original) {
-		if (!CompanionCommonConfig.petForceTeleportingIfFollowFailed) {
-			original.call(pos);
-			return;
-		}
-		Hooks.teleportWithRandomOffset(this, level(), pos, null, getOwner())
+		Hooks.teleportWithRandomOffset(
+						(TamableAnimal) (Object) this,
+						owner.level(),
+						owner.blockPosition().relative(owner.getDirection().getOpposite(), 3),
+						null,
+						owner)
 				.ifPresent(vec -> teleportTo(vec.x, vec.y, vec.z));
 	}
-
 }

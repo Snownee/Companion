@@ -5,7 +5,6 @@
 	"compatibilityLevel": "JAVA_16",
 	"refmap": "companion.refmap.json",
 	"mixins": [
-		"EndPortalBlockMixin",
 		"EntityAccess",
 		"EntityMixin",
 		"FollowOwnerGoalMixin",
@@ -13,14 +12,11 @@
 		"LivingEntityMixin",
 		"MobAccess",
 		"MobMixin",
-		"OwnerHurtByTargetGoalMixin",
-		"OwnerHurtTargetGoalMixin",
 		"PersistentEntitySectionManagerMixin",
 		"PlayerMixin",
 		"PlayerMixinFailsafe",
 		"ServerPlayerMixin",
 		"ServerPlayerMixinPortingLib",
-		"TamableAnimalAccess",
 		"TamableAnimalMixin",
 		"TargetGoalAccess",
 		"TargetGoalMixin"

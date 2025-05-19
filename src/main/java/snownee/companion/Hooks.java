@@ -57,7 +57,6 @@ import snownee.companion.mixin.MobAccess;
 
 public class Hooks {
 
-	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
 	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(
 			Registries.ITEM,
 			new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
@@ -308,10 +307,10 @@ public class Hooks {
 	}
 
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
-		if (player.isHolding($ -> $.is(RANGED_WEAPON))) {
+		if (player.isHolding(CommonProxy::isRangedWeapon)) {
 			ItemStack main = player.getMainHandItem();
 			ItemStack off = player.getOffhandItem();
-			ItemStack stack = main.is(RANGED_WEAPON) ? main : off;
+			ItemStack stack = CommonProxy.isRangedWeapon(main) ? main : off;
 			if (stack.getItem() instanceof CrossbowItem) {
 				if (CrossbowItem.isCharged(stack)) {
 					return true;
