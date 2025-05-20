@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.sugar.Local;
+
 import io.github.fabricators_of_create.porting_lib.entity.ITeleporter;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +23,6 @@ public abstract class ServerPlayerMixinPortingLib {
 	public abstract ServerLevel serverLevel();
 
 	// We teleport all pets before level info being synced
-	@SuppressWarnings("rawtypes")
 	@Dynamic("io.github.fabricators_of_create.porting_lib.entity.mixin.common.ServerPlayerMixin")
 	@Inject(
 			at = @At(
@@ -34,9 +35,10 @@ public abstract class ServerPlayerMixinPortingLib {
 	private void companion_changeDimension(
 			ServerLevel to,
 			ITeleporter teleporter,
-			CallbackInfoReturnable<Entity> cir) {
+			CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), false);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, false);
 		}
 	}
 
@@ -48,9 +50,13 @@ public abstract class ServerPlayerMixinPortingLib {
 			method = "changeDimension(Lnet/minecraft/server/level/ServerLevel;Lio/github/fabricators_of_create/porting_lib/entity/ITeleporter;)Lnet/minecraft/world/entity/Entity;",
 			require = 0
 	)
-	private void companion_returnFromEnd(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir) {
+	private void companion_returnFromEnd(
+			ServerLevel to,
+			ITeleporter teleporter,
+			CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), true);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, true);
 		}
 	}
 

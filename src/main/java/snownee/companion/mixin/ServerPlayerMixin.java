@@ -6,6 +6,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.llamalad7.mixinextras.sugar.Local;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -27,9 +29,12 @@ public abstract class ServerPlayerMixin {
 			),
 			method = "changeDimension"
 	)
-	private void companion_changeDimension(final ServerLevel to, final CallbackInfoReturnable<Entity> cir) {
+	private void companion_changeDimension(
+			final ServerLevel to,
+			final CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), false);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, false);
 		}
 	}
 
@@ -37,9 +42,12 @@ public abstract class ServerPlayerMixin {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"),
 			method = "changeDimension"
 	)
-	private void companion_returnFromEnd(ServerLevel to, CallbackInfoReturnable<Entity> cir) {
+	private void companion_returnFromEnd(
+			ServerLevel to,
+			CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), true);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, true);
 		}
 	}
 }

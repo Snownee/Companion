@@ -64,7 +64,7 @@ public class Hooks {
 	public static boolean traveling;
 	public static boolean indyPets = FabricLoader.getInstance().isModLoaded("indypets");
 
-	// Here is a bug that tamed wolf reset their health when it travels through portal.
+	// Here is a bug that tamed wolf reset their health when it travels through a portal.
 	// Good job mojang
 	public static void changeDimension(ServerPlayer player, ServerLevel to, ServerLevel from, boolean returnFromEnd) {
 		if (player.isSpectator() || player.isDeadOrDying()) {
