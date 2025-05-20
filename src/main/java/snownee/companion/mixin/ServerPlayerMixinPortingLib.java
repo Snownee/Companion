@@ -1,11 +1,11 @@
 package snownee.companion.mixin;
 
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import com.llamalad7.mixinextras.sugar.Local;
 
 import io.github.fabricators_of_create.porting_lib.entity.ITeleporter;
 import net.minecraft.server.level.ServerLevel;
@@ -15,10 +15,14 @@ import snownee.companion.CompanionCommonConfig;
 import snownee.companion.Hooks;
 
 @Mixin(value = ServerPlayer.class, priority = 1010)
-public class ServerPlayerMixinPortingLib {
+public abstract class ServerPlayerMixinPortingLib {
+
+	@Shadow
+	public abstract ServerLevel serverLevel();
 
 	// We teleport all pets before level info being synced
 	@SuppressWarnings("rawtypes")
+	@Dynamic("io.github.fabricators_of_create.porting_lib.entity.mixin.common.ServerPlayerMixin")
 	@Inject(
 			at = @At(
 					value = "INVOKE",
@@ -30,13 +34,13 @@ public class ServerPlayerMixinPortingLib {
 	private void companion_changeDimension(
 			ServerLevel to,
 			ITeleporter teleporter,
-			CallbackInfoReturnable<Entity> cir,
-			@Local(ordinal = 1) ServerLevel from) {
+			CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, false);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), false);
 		}
 	}
 
+	@Dynamic("io.github.fabricators_of_create.porting_lib.entity.mixin.common.ServerPlayerMixin")
 	@Inject(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"
@@ -46,8 +50,7 @@ public class ServerPlayerMixinPortingLib {
 	)
 	private void companion_returnFromEnd(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			ServerPlayer player = (ServerPlayer) (Object) this;
-			Hooks.changeDimension(player, to, player.serverLevel(), true);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, serverLevel(), true);
 		}
 	}
 
