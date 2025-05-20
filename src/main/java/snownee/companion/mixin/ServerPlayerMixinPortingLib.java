@@ -2,7 +2,6 @@ package snownee.companion.mixin;
 
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,9 +17,6 @@ import snownee.companion.Hooks;
 
 @Mixin(value = ServerPlayer.class, priority = 1010)
 public abstract class ServerPlayerMixinPortingLib {
-
-	@Shadow
-	public abstract ServerLevel serverLevel();
 
 	// We teleport all pets before level info being synced
 	@Dynamic("io.github.fabricators_of_create.porting_lib.entity.mixin.common.ServerPlayerMixin")

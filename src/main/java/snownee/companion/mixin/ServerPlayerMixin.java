@@ -1,7 +1,6 @@
 package snownee.companion.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -16,9 +15,6 @@ import snownee.companion.Hooks;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin {
-
-	@Shadow
-	public abstract ServerLevel serverLevel();
 
 	// We teleport all pets before level info being synced
 	@SuppressWarnings("rawtypes")
