@@ -4,19 +4,18 @@
 	"compatibilityLevel": "JAVA_16",
 	"refmap": "companion.refmap.json",
 	"mixins": [
-		"BooleanValueAccess",
 		"EntityAccess",
 		"EntityMixin",
 		"FollowOwnerGoalMixin",
+		"GoalSelectorMixin",
 		"LivingEntityMixin",
 		"MobMixin",
-		"OwnerHurtByTargetGoalMixin",
-		"OwnerHurtTargetGoalMixin",
 		"PersistentEntitySectionManagerMixin",
 		"PlayerMixin",
 		"PlayerMixinFailsafe",
 		"ServerPlayerMixin",
 		"TamableAnimalMixin",
+		"TargetGoalAccess",
 		"TargetGoalMixin"
 	],
 	"injectors": {

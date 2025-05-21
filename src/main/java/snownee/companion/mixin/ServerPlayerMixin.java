@@ -4,55 +4,52 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import net.minecraft.resources.ResourceKey;
+import com.llamalad7.mixinextras.sugar.Local;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.portal.PortalInfo;
-import net.minecraft.world.level.storage.LevelData;
 import net.minecraftforge.common.util.ITeleporter;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.Hooks;
 
 @Mixin(ServerPlayer.class)
-public class ServerPlayerMixin {
+public abstract class ServerPlayerMixin {
 
 	// We teleport all pets before level info being synced
 	@SuppressWarnings("rawtypes")
 	@Inject(
 			at = @At(
 					value = "INVOKE",
-					target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V",
-					remap = true
-			), method = "changeDimension", locals = LocalCapture.CAPTURE_FAILHARD, remap = false
+					remap = true,
+					target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
+			),
+			remap = false,
+			method = "changeDimension"
 	)
 	private void companion_changeDimension(
-			ServerLevel to,
-			ITeleporter teleporter,
-			CallbackInfoReturnable<Entity> cir,
-			ServerLevel from,
-			ResourceKey resourceKey,
-			LevelData levelData,
-			PlayerList playerList,
-			PortalInfo portalInfo) {
+			final ServerLevel to,
+			final ITeleporter teleporter,
+			final CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
 			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, false);
 		}
 	}
 
 	@Inject(
-			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V", remap = true
-			), method = "changeDimension", remap = false
+			at = @At(value = "INVOKE", remap = true, target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"),
+			remap = false,
+			method = "changeDimension"
 	)
-	private void companion_returnFromEnd(ServerLevel to, ITeleporter teleporter, CallbackInfoReturnable<Entity> cir) {
+	private void companion_returnFromEnd(
+			final ServerLevel to,
+			final ITeleporter teleporter,
+			final CallbackInfoReturnable<Entity> cir,
+			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {
-			ServerPlayer player = (ServerPlayer) (Object) this;
-			Hooks.changeDimension(player, to, player.serverLevel(), true);
+			Hooks.changeDimension((ServerPlayer) (Object) this, to, from, true);
 		}
 	}
-
 }

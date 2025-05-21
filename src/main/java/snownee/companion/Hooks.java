@@ -18,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -54,7 +56,6 @@ public class Hooks {
 
 	public static boolean traveling;
 	public static boolean alexsMobs = ModList.get().isLoaded("alexsmobs");
-	public static final TagKey<Item> RANGED_WEAPON = TagKey.create(Registries.ITEM, new ResourceLocation(Companion.ID, "ranged_weapon"));
 	public static final TagKey<Item> CHARGED_RANGED_WEAPON = TagKey.create(
 			Registries.ITEM,
 			new ResourceLocation(Companion.ID, "charged_ranged_weapon"));
@@ -220,11 +221,22 @@ public class Hooks {
 		return !moved.intersects(avoidColliding) && level.noCollision(entity, moved);
 	}
 
-	public static boolean wantsToAttack(TamableAnimal pet, LivingEntity enemy) {
+	public static boolean wantsToAttack(TamableAnimal pet, @Nullable LivingEntity enemy) {
+		if (!pet.isTame()) {
+			return true;
+		}
+		if (isImmortalDying(pet)) {
+			return false;
+		}
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
-			return !(enemy instanceof Enemy || enemy instanceof IronGolem);
+			return enemy != null && !(enemy instanceof Enemy || enemy instanceof IronGolem);
 		}
 		return true;
+	}
+
+	public static boolean isImmortalDying(LivingEntity entity) {
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
+				Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -287,10 +299,10 @@ public class Hooks {
 	}
 
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
-		if (player.isHolding($ -> $.is(RANGED_WEAPON))) {
+		if (player.isHolding(CommonProxy::isRangedWeapon)) {
 			ItemStack main = player.getMainHandItem();
 			ItemStack off = player.getOffhandItem();
-			ItemStack stack = main.is(RANGED_WEAPON) ? main : off;
+			ItemStack stack = CommonProxy.isRangedWeapon(main) ? main : off;
 			if (stack.getItem() instanceof CrossbowItem) {
 				if (CrossbowItem.isCharged(stack)) {
 					return true;
@@ -315,10 +327,11 @@ public class Hooks {
 		if (ownerUUID == null) {
 			return null;
 		}
-		if (entity.level().getServer() == null) {
+		MinecraftServer server = entity.level().getServer();
+		if (server == null) {
 			return entity.level().getPlayerByUUID(ownerUUID);
 		}
-		return entity.level().getServer().getPlayerList().getPlayer(ownerUUID);
+		return server.getPlayerList().getPlayer(ownerUUID);
 	}
 
 	@Nullable
@@ -329,4 +342,13 @@ public class Hooks {
 		return null;
 	}
 
+	public static void stopAttacking(Mob mob) {
+		mob.setTarget(null);
+		for (WrappedGoal goal : mob.targetSelector.getAvailableGoals()) {
+			goal.stop();
+		}
+		if (mob.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
+			mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
+		}
+	}
 }
