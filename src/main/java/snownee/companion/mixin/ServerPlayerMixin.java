@@ -22,8 +22,10 @@ public abstract class ServerPlayerMixin {
 	@Inject(
 			at = @At(
 					value = "INVOKE",
+					remap = true,
 					target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"
 			),
+			remap = false,
 			method = "changeDimension"
 	)
 	private void companion_changeDimension(
@@ -37,7 +39,8 @@ public abstract class ServerPlayerMixin {
 	}
 
 	@Inject(
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"),
+			at = @At(value = "INVOKE", remap = true, target = "Lnet/minecraft/server/level/ServerPlayer;unRide()V"),
+			remap = false,
 			method = "changeDimension"
 	)
 	private void companion_returnFromEnd(
