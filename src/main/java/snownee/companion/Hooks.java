@@ -277,6 +277,9 @@ public class Hooks {
 		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
 			return false;
 		}
+		if (pet.hasRestriction() && !pet.isWithinRestriction(owner.blockPosition())) {
+			return false;
+		}
 		if (pet instanceof TamableAnimal animal && animal.isOrderedToSit()) {
 			return false;
 		}
