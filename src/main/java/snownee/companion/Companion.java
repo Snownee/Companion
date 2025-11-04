@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.GameRules;
 
 public class Companion {
@@ -23,4 +24,8 @@ public class Companion {
 			"alwaysTeleportHorses",
 			GameRules.Category.PLAYER,
 			false);
+
+	public static ResourceLocation RL(String path) {
+		return new ResourceLocation(ID, path);
+	}
 }

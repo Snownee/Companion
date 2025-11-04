@@ -235,8 +235,10 @@ public class Hooks {
 	}
 
 	public static boolean isImmortalDying(LivingEntity entity) {
-		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
-				Hooks.getEntityOwner(entity) != null;
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1
+				&& entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS)
+				&& !entity.getType().is(CommonProxy.IMMORTAL_BLACKLIST)
+				&& Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -254,20 +256,21 @@ public class Hooks {
 						//						newEntity = entity.changeDimension((ServerLevel) owner.level, CompanionTeleporter.INSTANCE);
 					}
 					BlockPos pos = owner.blockPosition();
-					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(vec -> {
-						entity.teleportTo(vec.x, vec.y, vec.z);
-					}, () -> {
-						if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
-								CompanionCommonConfig.logIfTeleportingFailed) {
-							Companion.LOGGER.warn(
-									"Failed to teleport {}({}) from {} {} to {}",
-									entity.getDisplayName().getString(),
-									BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
-									entity.level().dimension().location(),
-									entity.blockPosition().toShortString(),
-									pos.toShortString());
-						}
-					});
+					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(
+							vec -> {
+								entity.teleportTo(vec.x, vec.y, vec.z);
+							}, () -> {
+								if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
+										CompanionCommonConfig.logIfTeleportingFailed) {
+									Companion.LOGGER.warn(
+											"Failed to teleport {}({}) from {} {} to {}",
+											entity.getDisplayName().getString(),
+											BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
+											entity.level().dimension().location(),
+											entity.blockPosition().toShortString(),
+											pos.toShortString());
+								}
+							});
 				}
 			}
 		}
@@ -291,14 +294,15 @@ public class Hooks {
 		if (pet instanceof AbstractHorse) {
 			return pet.level().getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
 		}
-		return FOLLOWABLE_CACHE.computeIfAbsent(pet.getClass(), $ -> {
-			for (WrappedGoal goal : pet.goalSelector.getAvailableGoals()) {
-				if (goal.getGoal() instanceof FollowOwnerGoal) {
-					return true;
-				}
-			}
-			return false;
-		});
+		return FOLLOWABLE_CACHE.computeIfAbsent(
+				pet.getClass(), $ -> {
+					for (WrappedGoal goal : pet.goalSelector.getAvailableGoals()) {
+						if (goal.getGoal() instanceof FollowOwnerGoal) {
+							return true;
+						}
+					}
+					return false;
+				});
 	}
 
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
