@@ -131,29 +131,34 @@ public class Hooks {
 	}
 
 	public static Optional<Vec3> teleportWithRandomOffset(
-			Mob entity,
+			Mob pet,
 			Level level,
 			BlockPos blockPos,
 			@Nullable Boolean canFly,
-			@Nullable Entity avoidColliding) {
+			@Nullable Entity owner) {
 		boolean _canFly = canFly != null ?
 				canFly :
-				entity instanceof FlyingAnimal || entity instanceof TamableAnimalAccess tamable && tamable.callCanFlyToOwner();
-		AABB box = avoidColliding == null ? null : avoidColliding.getBoundingBox();
-		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(entity, level, blockPos, _canFly, box);
+				pet instanceof FlyingAnimal || pet instanceof TamableAnimalAccess tamable && tamable.callCanFlyToOwner();
+		AABB box = owner == null ? null : owner.getBoundingBox();
+		Vec3 ownerFacing = null;
+		if (owner instanceof LivingEntity living) {
+			float yaw = living.yBodyRot * ((float) Math.PI / 180F);
+			ownerFacing = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw));
+		}
+		Optional<Vec3> vec3 = teleportWithRandomOffsetInternal(pet, level, blockPos, _canFly, box, ownerFacing);
 		if (vec3.isPresent() || _canFly) {
 			return vec3;
 		}
 		BlockPos heightmapPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockPos);
 		if (heightmapPos.getY() < blockPos.getY()) {
-			return teleportWithRandomOffsetInternal(entity, level, heightmapPos, false, box);
+			return teleportWithRandomOffsetInternal(pet, level, heightmapPos, false, box, ownerFacing);
 		}
 		BlockPos.MutableBlockPos mutable = blockPos.mutable().move(Direction.DOWN);
 		for (int i = 0; i < 25; ++i) {
 			mutable.move(Direction.DOWN);
 			BlockState blockState = level.getBlockState(mutable);
 			if (Heightmap.Types.MOTION_BLOCKING.isOpaque().test(blockState)) {
-				return teleportWithRandomOffsetInternal(entity, level, mutable, false, box);
+				return teleportWithRandomOffsetInternal(pet, level, mutable, false, box, ownerFacing);
 			}
 		}
 		return Optional.empty();
@@ -164,7 +169,8 @@ public class Hooks {
 			Level level,
 			BlockPos blockPos,
 			boolean canFly,
-			@Nullable AABB avoidColliding) {
+			@Nullable AABB avoidColliding,
+			@Nullable Vec3 ownerFacing) {
 		if (entity.level() == level && blockPos.distToCenterSqr(entity.position()) < 16) {
 			return Optional.empty();
 		}
@@ -174,6 +180,9 @@ public class Hooks {
 			int j = randomIntInclusive(random, -3, 3);
 			int l = randomIntInclusive(random, -3, 3);
 			if (Math.abs(j) + Math.abs(l) < 2) {
+				continue;
+			}
+			if (ownerFacing != null && isInFrontOfOwner(j, l, ownerFacing)) {
 				continue;
 			}
 			int k = randomIntInclusive(random, -1, 1);
@@ -187,6 +196,11 @@ public class Hooks {
 
 	private static int randomIntInclusive(RandomSource random, int i, int j) {
 		return random.nextInt(j - i + 1) + i;
+	}
+
+	private static boolean isInFrontOfOwner(int offsetX, int offsetZ, Vec3 ownerFacing) {
+		double dotProduct = offsetX * ownerFacing.x + offsetZ * ownerFacing.z;
+		return dotProduct > 0;
 	}
 
 	private static boolean canTeleportTo(Mob entity, Level level, BlockPos blockPos, boolean canFly, @Nullable AABB avoidColliding) {
