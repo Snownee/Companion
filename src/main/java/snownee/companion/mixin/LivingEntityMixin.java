@@ -15,7 +15,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
-import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionTamableAnimal;
 import snownee.companion.Hooks;
@@ -34,8 +33,7 @@ public class LivingEntityMixin {
 
 	@WrapOperation(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
 	private void companion_setHealth(LivingEntity entity, float health, Operation<Void> original) {
-		if (health < 1 && !entity.isDeadOrDying() && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
-				Hooks.getEntityOwner(entity) != null) {
+		if (Hooks.isImmortalDying(entity)) {
 			health = 1;
 		}
 		original.call(entity, health);

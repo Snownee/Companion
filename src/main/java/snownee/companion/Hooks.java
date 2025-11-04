@@ -15,12 +15,9 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,7 +34,6 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
@@ -60,9 +56,6 @@ import snownee.kiwi.util.NotNullByDefault;
 @NotNullByDefault
 public class Hooks {
 
-	public static final TagKey<Item> CHARGED_RANGED_WEAPONS = TagKey.create(
-			Registries.ITEM,
-			ResourceLocation.fromNamespaceAndPath(Companion.ID, "charged_ranged_weapons"));
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
 	public static boolean traveling;
 	public static boolean indyPets = Platform.isModLoaded("indypets");
@@ -243,8 +236,10 @@ public class Hooks {
 	}
 
 	public static boolean isImmortalDying(LivingEntity entity) {
-		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
-				Hooks.getEntityOwner(entity) != null;
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1
+				&& entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS)
+				&& !entity.getType().is(Companion.IMMORTAL_BLACKLIST)
+				&& Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -323,7 +318,8 @@ public class Hooks {
 				return true;
 			}
 		}
-		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 && player.isHolding($ -> $.is(CHARGED_RANGED_WEAPONS))) {
+		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 &&
+				player.isHolding($ -> $.is(Companion.CHARGED_RANGED_WEAPONS))) {
 			ItemStack stack = player.getUseItem();
 			UseAnim anim = stack.getUseAnimation();
 			if (anim == UseAnim.BOW || anim == UseAnim.CROSSBOW || anim == UseAnim.SPEAR) {
