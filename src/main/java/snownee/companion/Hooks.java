@@ -319,6 +319,11 @@ public class Hooks {
 				});
 	}
 
+	public static boolean isFollowingOwner(Mob pet) {
+		return pet.goalSelector.getRunningGoals()
+				.anyMatch(goal -> goal.getGoal() instanceof FollowOwnerGoal);
+	}
+
 	public static boolean isHoldingRangedWeapon(ServerPlayer player) {
 		if (player.isHolding(CommonProxy::isRangedWeapon)) {
 			ItemStack main = player.getMainHandItem();
