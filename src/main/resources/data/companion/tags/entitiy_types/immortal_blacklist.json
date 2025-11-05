@@ -1,7 +1,13 @@
 {
 	"replace": false,
 	"values": [
-		"born_in_chaos_v1:controlled_baby_skeleton",
-		"born_in_chaos_v1:mr_pumpkin_controlled"
+		{
+			"id": "born_in_chaos_v1:controlled_baby_skeleton",
+			"required": false
+		},
+		{
+			"id": "born_in_chaos_v1:mr_pumpkin_controlled",
+			"required": false
+		}
 	]
 }
