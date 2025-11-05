@@ -2,23 +2,22 @@ buildscript {
     repositories {
         // These repositories are only for Gradle plugins, put any other repositories in the repository block further below
         maven { url = 'https://maven.minecraftforge.net' }
-        //maven { url = 'https://maven.parchmentmc.org' }
         maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        //classpath 'org.parchmentmc:librarian:1.+'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 
 plugins {
-    id "me.shedaniel.unified-publishing" version "0.1.+"
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-//apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
@@ -240,39 +239,31 @@ publishing {
     }
 }
 
-unifiedPublishing {
-    project {
-        displayName = "[Forge $project.supported_version] $project.mod_version"
-        version = realVersion // Optional, Inferred from project by default
-        changelog = file("CHANGELOG.md").exists() ? file("CHANGELOG.md").text : "" // Optional, in markdown format
-        releaseType = project.release_type // Optional, use "release", "beta" or "alpha"
-        gameVersions = ["1.20.1"]
-        gameLoaders = ["forge", "neoforge"]
+tasks {
+    publishMods {
+        file = jar.archiveFile
+        changelog = file('CHANGELOG.md').exists() ? file('CHANGELOG.md').text : ''
+        type = STABLE
+        modLoaders.add("forge")
+        modLoaders.add("neoforge")
+        displayName = "[Forge ${supported_version}] ${mod_version}"
+        version = realVersion
 
-        mainPublication tasks.jar // Declares the publicated jar
+        curseforge {
+            projectId = "559989"
+            accessToken = providers.environmentVariable("CURSE_TOKEN")
+            minecraftVersions.add("1.20.1")
 
-        if (System.getenv("CURSE_TOKEN") != null) {
-            curseforge {
-                token = System.getenv("CURSE_TOKEN")
-                id = "559989" // Required, must be a string, ID of CurseForge project
-
-                relations { // Optional, Inferred from the relations above by default
-                    depends "kiwi"
-                    optional "cloth-config"
-                }
-            }
+            requires("kiwi")
+            optional("cloth-config")
         }
+        modrinth {
+            projectId = "4w0EzGRW"
+            accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+            minecraftVersions.add("1.20.1")
 
-        if (System.getenv("MODRINTH_TOKEN") != null) {
-            modrinth {
-                token = System.getenv("MODRINTH_TOKEN")
-                id = "4w0EzGRW" // Required, must be a string, ID of Modrinth project
-
-                relations { // Optional, Inferred from the relations above by default
-                    depends "kiwi"
-                    optional "cloth-config"
-                }
-            }
+            requires("kiwi")
+            optional("cloth-config")
         }
     }
 }
