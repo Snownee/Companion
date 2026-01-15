@@ -5,10 +5,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.lizin5ths.indypets.util.IndyPetsUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -29,31 +28,29 @@ import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
 import net.minecraft.world.entity.ai.goal.WrappedGoal;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.FlyingAnimal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.PathfindingContext;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import snownee.companion.mixin.MobAccess;
 import snownee.companion.mixin.TamableAnimalAccess;
 import snownee.kiwi.loader.Platform;
-import snownee.kiwi.util.NotNullByDefault;
 
-@NotNullByDefault
 public class Hooks {
 
 	public static final Object2BooleanMap<Class<?>> FOLLOWABLE_CACHE = new Object2BooleanOpenHashMap<>();
@@ -95,7 +92,7 @@ public class Hooks {
 			if (entity instanceof Mob mob) {
 				entity.setPortalCooldown();
 				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, player.blockPosition(), false, player).orElseGet(player::position);
-				entity.changeDimension(new DimensionTransition(to, dest, Vec3.ZERO, 0.0F, 0.0F, DimensionTransition.DO_NOTHING));
+				entity.teleport(new TeleportTransition(to, dest, Vec3.ZERO, 0.0F, 0.0F, TeleportTransition.DO_NOTHING));
 			}
 		}
 	}
@@ -103,7 +100,7 @@ public class Hooks {
 	public static List<Entity> getAllPets(ServerLevel level, ServerLevel to, ServerPlayer player) {
 		int max = CompanionCommonConfig.portalMaxTeleportedPets;
 		if (max == -1) {
-			max = level.getGameRules().getInt(GameRules.RULE_MAX_ENTITY_CRAMMING);
+			max = level.getGameRules().get(GameRules.MAX_ENTITY_CRAMMING);
 		}
 		traveling = true;
 		List<Entity> entities = Lists.newArrayList();
@@ -111,7 +108,7 @@ public class Hooks {
 			if (entities.size() >= max) {
 				break;
 			}
-			if (entity.isPassenger() || !entity.canChangeDimensions(level, to)) {
+			if (entity.isPassenger() || !entity.canTeleport(level, to)) {
 				continue;
 			}
 			if (entity instanceof Mob mob) {
@@ -121,7 +118,7 @@ public class Hooks {
 					}
 					continue;
 				}
-				if (Objects.equals(player.getUUID(), getEntityOwnerUUID(mob)) && shouldFollowOwner(player, mob)) {
+				if (Objects.equals(player.getUUID(), getEntityOwnerUUID(mob)) && shouldFollowOwner(level, player, mob)) {
 					entities.add(mob);
 				}
 			}
@@ -236,11 +233,11 @@ public class Hooks {
 		return !moved.intersects(avoidColliding) && level.noCollision(entity, moved);
 	}
 
-	public static boolean wantsToAttack(TamableAnimal pet, @Nullable LivingEntity enemy) {
+	public static boolean wantsToAttack(ServerLevel level, TamableAnimal pet, @Nullable LivingEntity enemy) {
 		if (!pet.isTame()) {
 			return true;
 		}
-		if (isImmortalDying(pet)) {
+		if (isImmortalDying(level, pet)) {
 			return false;
 		}
 		if (CompanionCommonConfig.petWontAttackWhenInjured && isInjured(pet)) {
@@ -249,10 +246,10 @@ public class Hooks {
 		return true;
 	}
 
-	public static boolean isImmortalDying(LivingEntity entity) {
+	public static boolean isImmortalDying(ServerLevel level, LivingEntity entity) {
 		return !entity.isDeadOrDying() && entity.getHealth() <= 1
-				&& entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS)
-				&& !entity.getType().is(Companion.IMMORTAL_BLACKLIST)
+				&& level.getGameRules().get(Companion.IMMORTAL_PETS)
+				&& !entity.is(Companion.IMMORTAL_BLACKLIST)
 				&& Hooks.getEntityOwner(entity) != null;
 	}
 
@@ -265,12 +262,12 @@ public class Hooks {
 		for (var entityAccess : entities) {
 			if (entityAccess instanceof Mob entity) {
 				Player owner = getEntityOwner(entity);
-				if (shouldFollowOwner(owner, entity)) {
-					if (owner.level() != entity.level()) {
+				if (owner != null && owner.level() instanceof ServerLevel level && shouldFollowOwner(level, owner, entity)) {
+					if (level != entity.level()) {
 						continue;
 					}
 					BlockPos pos = owner.blockPosition();
-					teleportWithRandomOffset(entity, owner.level(), pos, null, owner).ifPresentOrElse(
+					teleportWithRandomOffset(entity, level, pos, null, owner).ifPresentOrElse(
 							vec -> entity.teleportTo(vec.x, vec.y, vec.z), () -> {
 								if (!entity.randomTeleport(pos.getX(), pos.getY(), pos.getZ(), false) &&
 										CompanionCommonConfig.logIfTeleportingFailed) {
@@ -278,7 +275,7 @@ public class Hooks {
 											"Failed to teleport {}({}) from {} {} to {}",
 											Objects.requireNonNull(entity.getDisplayName()).getString(),
 											BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()),
-											entity.level().dimension().location(),
+											entity.level().dimension().identifier(),
 											entity.blockPosition().toShortString(),
 											pos.toShortString());
 								}
@@ -288,11 +285,11 @@ public class Hooks {
 		}
 	}
 
-	public static boolean shouldFollowOwner(@Nullable LivingEntity owner, Mob pet) {
+	public static boolean shouldFollowOwner(ServerLevel level, @Nullable LivingEntity owner, Mob pet) {
 		if (owner == null || owner.isDeadOrDying() || owner.isSpectator() || pet.isLeashed() || pet.isPassenger()) {
 			return false;
 		}
-		if (pet.hasRestriction() && !pet.isWithinRestriction(owner.blockPosition())) {
+		if (pet.hasHome() && !pet.isWithinHome(owner.blockPosition())) {
 			return false;
 		}
 		if (pet instanceof TamableAnimal animal) {
@@ -300,16 +297,16 @@ public class Hooks {
 				return false;
 			}
 			if (indyPets) {
-				if (IndyPetsUtil.isIndependent(animal)) {
-					return false;
-				}
+//				if (IndyPetsUtil.isIndependent(animal)) {
+//					return false;
+//				}
 			}
 		}
 		if (pet instanceof AbstractHorse) {
-			return pet.level().getGameRules().getBoolean(Companion.ALWAYS_TELEPORT_HORSES);
+			return level.getGameRules().get(Companion.ALWAYS_TELEPORT_HORSES);
 		}
 		return FOLLOWABLE_CACHE.computeIfAbsent(
-				pet.getClass(), $ -> {
+				pet.getClass(), _ -> {
 					for (WrappedGoal goal : ((MobAccess) pet).getGoalSelector().getAvailableGoals()) {
 						if (goal.getGoal() instanceof FollowOwnerGoal) {
 							return true;
@@ -335,8 +332,8 @@ public class Hooks {
 		if (player.isUsingItem() && player.getUseItemRemainingTicks() > 0 &&
 				player.isHolding($ -> $.is(Companion.CHARGED_RANGED_WEAPONS))) {
 			ItemStack stack = player.getUseItem();
-			UseAnim anim = stack.getUseAnimation();
-			if (anim == UseAnim.BOW || anim == UseAnim.CROSSBOW || anim == UseAnim.SPEAR) {
+			ItemUseAnimation anim = stack.getUseAnimation();
+			if (anim == ItemUseAnimation.BOW || anim == ItemUseAnimation.CROSSBOW || anim == ItemUseAnimation.SPEAR) {
 				return true;
 			}
 		}
@@ -358,8 +355,8 @@ public class Hooks {
 
 	@Nullable
 	public static UUID getEntityOwnerUUID(Entity entity) {
-		if (entity instanceof OwnableEntity ownableEntity) {
-			return ownableEntity.getOwnerUUID();
+		if (entity instanceof OwnableEntity ownableEntity && ownableEntity.getOwnerReference() != null) {
+			return ownableEntity.getOwnerReference().getUUID();
 		}
 		return null;
 	}

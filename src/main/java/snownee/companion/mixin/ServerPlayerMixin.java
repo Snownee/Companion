@@ -9,8 +9,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.Hooks;
 
@@ -18,12 +17,12 @@ import snownee.companion.Hooks;
 public class ServerPlayerMixin {
 
 	@Inject(
-			method = "changeDimension", at = @At(
+			method = "teleport", at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/server/players/PlayerList;sendLevelInfo(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/level/ServerLevel;)V"))
 	private void companion_changeDimension(
-			DimensionTransition dimensionTransition,
-			CallbackInfoReturnable<Entity> cir,
+			TeleportTransition transition,
+			CallbackInfoReturnable<ServerPlayer> cir,
 			@Local(ordinal = 0) ServerLevel to,
 			@Local(ordinal = 1) ServerLevel from) {
 		if (CompanionCommonConfig.portalTeleportingPets) {

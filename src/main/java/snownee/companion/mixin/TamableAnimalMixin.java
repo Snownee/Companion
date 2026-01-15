@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,7 +31,7 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 	}
 
 	@Override
-	public void companion$tryTeleportToOwner(DamageSource damageSource) {
+	public void companion$tryTeleportToOwner(ServerLevel level, DamageSource damageSource) {
 		if (!Hooks.isInjured(this)) {
 			return;
 		}
@@ -42,10 +43,10 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 		if (damageSource.getEntity() instanceof Mob attacker) {
 			Hooks.stopAttacking(attacker);
 		}
-		if (owner == damageSource.getEntity() || !Hooks.shouldFollowOwner(owner, this)) {
+		if (owner == damageSource.getEntity() || !Hooks.shouldFollowOwner(level, owner, this)) {
 			return;
 		}
-		long time = level().getGameTime();
+		long time = level.getGameTime();
 		long interval = time - companion$lastTeleportation;
 		if (interval > 0 && interval < 600) {
 			return;

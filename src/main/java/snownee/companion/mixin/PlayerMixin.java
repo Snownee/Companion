@@ -1,5 +1,6 @@
 package snownee.companion.mixin;
 
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -8,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +25,7 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	@Inject(at = @At("TAIL"), method = "aiStep")
 	private void companion_aiStep(CallbackInfo ci) {
 		Player player = (Player) (Object) this;
-		if (player.level().isClientSide) {
+		if (player.level().isClientSide()) {
 			return;
 		}
 		if (player.isSleeping() || player.isInPowderSnow) {
@@ -49,8 +51,8 @@ public abstract class PlayerMixin implements CompanionPlayer {
 		//TODO under lava???
 	}
 
-	@Inject(at = @At("TAIL"), method = "hurt")
-	private void companion_hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
+	@Inject(at = @At("TAIL"), method = "hurtServer")
+	private void companion_hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
 		if (f > CompanionCommonConfig.shoulderDismountDamageThreshold) {
 			removeEntitiesOnShoulder();
 		}
@@ -60,15 +62,15 @@ public abstract class PlayerMixin implements CompanionPlayer {
 	protected abstract void removeEntitiesOnShoulder();
 
 	@Unique
-	private Vec3 companion$jumpPos;
+	private @Nullable Vec3 companion$jumpPos;
 
 	@Override
-	public Vec3 companion$getJumpPos() {
+	public @Nullable Vec3 companion$getJumpPos() {
 		return companion$jumpPos;
 	}
 
 	@Override
-	public void companion$setJumpPos(Vec3 pos) {
+	public void companion$setJumpPos(@Nullable Vec3 pos) {
 		this.companion$jumpPos = pos;
 	}
 
@@ -77,16 +79,11 @@ public abstract class PlayerMixin implements CompanionPlayer {
 		removeEntitiesOnShoulder();
 	}
 
-	@Inject(at = @At("HEAD"), method = "jumpFromGround")
-	private void companion_jumpFromGround(CallbackInfo ci) {
-		companion$jumpPos = ((Player) (Object) this).position();
-	}
-
 	@Inject(at = @At("HEAD"), method = "attack", cancellable = true)
 	private void companion_attack(Entity entity, CallbackInfo ci) {
 		if (Hooks.getEntityOwner(entity) == (Object) this) {
 			Player self = (Player) (Object) this;
-			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
+			if (self.level() instanceof ServerLevel level && !level.getGameRules().get(Companion.PET_FRIENDLY_FIRE)) {
 				ci.cancel();
 			}
 		}

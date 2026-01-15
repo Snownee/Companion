@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EndPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,10 +20,17 @@ import snownee.companion.Hooks;
 public class EndPortalBlockMixin {
 
 	@Inject(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;showEndCredits()V"))
-	private void companion_entityInside(BlockState blockState, Level level, BlockPos blockPos, Entity entity, CallbackInfo ci) {
+	private void companion_entityInside(
+			BlockState state,
+			Level level,
+			BlockPos pos,
+			Entity entity,
+			InsideBlockEffectApplier effectApplier,
+			boolean isPrecise,
+			CallbackInfo ci) {
 		if (CompanionCommonConfig.portalTeleportingPets && level instanceof ServerLevel serverLevel &&
 				entity instanceof ServerPlayer player) {
-			Hooks.changeDimension(player, player.server.overworld(), serverLevel, true);
+			Hooks.changeDimension(player, serverLevel.getServer().overworld(), serverLevel, true);
 		}
 	}
 

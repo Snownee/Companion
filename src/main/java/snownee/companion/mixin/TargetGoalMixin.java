@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
@@ -24,7 +25,7 @@ public class TargetGoalMixin {
 
 	@Inject(at = @At("HEAD"), method = "canContinueToUse", cancellable = true)
 	private void companion_canContinueToUse(CallbackInfoReturnable<Boolean> ci) {
-		if (targetMob != null && mob instanceof TamableAnimal pet && !Hooks.wantsToAttack(pet, targetMob)) {
+		if (targetMob != null && mob instanceof TamableAnimal pet && !Hooks.wantsToAttack((ServerLevel) pet.level(), pet, targetMob)) {
 			ci.setReturnValue(false);
 		}
 	}
