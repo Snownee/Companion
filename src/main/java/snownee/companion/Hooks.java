@@ -218,7 +218,7 @@ public class Hooks {
 				if (!aboveState.isAir()) {
 					return false;
 				}
-			} else if (blockPathType == PathType.LAVA || blockPathType == PathType.DAMAGE_FIRE || blockPathType == PathType.DANGER_FIRE) {
+			} else if (blockPathType == PathType.LAVA || blockPathType == PathType.FIRE || blockPathType == PathType.FIRE_IN_NEIGHBOR) {
 				if (!entity.fireImmune()) {
 					return false;
 				}

@@ -39,11 +39,10 @@ dependencies {
 //        exclude(group: "net.fabricmc")
 //    }
 
-    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-//    implementation "maven.modrinth:kiwi:${project.kiwi_version}+fabric"
-//    annotationProcessor "maven.modrinth:kiwi:${project.kiwi_version}+fabric"
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    annotationProcessor fileTree(dir: "libs", include: ["*.jar"])
+//    implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+    implementation annotationProcessor("maven.modrinth:kiwi:${project.kiwi_version}+fabric")
+//    implementation fileTree(dir: "libs", include: ["*.jar"])
+//    annotationProcessor fileTree(dir: "libs", include: ["*.jar"])
 //    implementation "maven.modrinth:indypets:1.4.3-1.21"
 }
 
