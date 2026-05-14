@@ -1,16 +1,16 @@
 plugins {
-    id 'net.neoforged.moddev' version '2.0.80'
+    id 'net.neoforged.moddev' version '2.0.141'
     id 'maven-publish'
     id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-archivesBaseName = project.archives_base_name
-version = project.minecraft_version + "-NeoForge-" + project.mod_version
+version = "mc${archive_minecraft_version}-NeoForge-${mod_version}"
 group = project.maven_group
 var realVersion = project.mod_version + '+neoforge'
+
+base {
+    archivesName = project.archives_base_name
+}
 
 neoForge {
     // We currently only support NeoForge versions later than 21.0.x
@@ -41,7 +41,7 @@ neoForge {
             ideName = "Run ${project.mod_id} - Server"
         }
         data {
-            data()
+            clientData()
             ideName = "Run ${project.mod_id} - Data"
             programArguments.addAll "--mod", "${mod_id}",
                     "--output", file('src/generated/resources/').getAbsolutePath(),
@@ -68,28 +68,19 @@ repositories {
 }
 
 dependencies {
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    implementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:${project.fabric_version}"
-
     api("me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_config_version}")
 
     // https://modrinth.com/mod/kiwi/versions
-    implementation(annotationProcessor("maven.modrinth:kiwi:15.5.0+neoforge"))
+    implementation(annotationProcessor("maven.modrinth:kiwi:26.0.7+neoforge"))
     // https://modrinth.com/mod/jade/versions
-    implementation "maven.modrinth:jade:15.10.0+neoforge"
+    runtimeOnly "maven.modrinth:jade:26.1.1+neoforge"
 
-    compileOnly "maven.modrinth:indypets:1.4.7-1.21"
+    compileOnly "maven.modrinth:indypets:1.5.2-26.1.1"
 }
 
 tasks.withType(JavaCompile).configureEach {
-    // ensure that the encoding is set to UTF-8, no matter what the system default is
-    // this fixes some edge cases with special characters not displaying correctly
-    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-    // If Javadoc is generated, this must be specified in that task too.
     it.options.encoding = "UTF-8"
-
-    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-    it.options.release = 21
+    it.options.release = 25
 }
 
 jar {
