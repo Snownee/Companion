@@ -15,7 +15,7 @@ public abstract class PlayerMixinFailsafe implements CompanionPlayer {
 	@WrapOperation(
 			at = @At(
 					value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;removeEntitiesOnShoulder()V"
-			), method = {"aiStep", "hurt"}, require = 0
+			), method = {"startAutoSpinAttack", "hurtServer"}, require = 0
 	)
 	private void nullifyDefaultRemoveEntitiesOnShoulder(Player player, Operation<Void> original) {
 		// NOOP

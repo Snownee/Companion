@@ -1,8 +1,8 @@
 {
-	"gamerule.companion:petFriendlyFire": "Дружній вогонь для улюбленців",
-	"gamerule.companion:petFriendlyFire.description": "Дружній вогонь для улюбленців. (від Companion)",
-	"gamerule.companion:alwaysTeleportHorses": "Завжди телепортувати коня",
-	"gamerule.companion:alwaysTeleportHorses.description": "Завжди телепортувати вашого коня, якщо він задалеко від вас. (від Companion)",
+	"gamerule.companion.pet_friendly_fire": "Дружній вогонь для улюбленців",
+	"gamerule.companion.pet_friendly_fire.description": "Дружній вогонь для улюбленців. (від Companion)",
+	"gamerule.companion.always_teleport_horses": "Завжди телепортувати коня",
+	"gamerule.companion.always_teleport_horses.description": "Завжди телепортувати вашого коня, якщо він задалеко від вас. (від Companion)",
 	"companion.config.shoulderPets": "Плечові улюбленці",
 	"companion.config.shoulderPets.smartDismount": "Розумне зняття",
 	"companion.config.shoulderPets.smartDismount.desc": "Підстрибніть на місті, щоб зняти плечового улюбленця",

@@ -10,15 +10,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionPlayer;
 import snownee.companion.Hooks;
@@ -29,7 +28,7 @@ public class EntityMixin {
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
 	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
 		Entity entity = (Entity) (Object) this;
-		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide && entity.fallDistance > 0 &&
+		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide() && entity.fallDistance > 0 &&
 				entity instanceof Player) {
 			CompanionPlayer player = (CompanionPlayer) this;
 			Vec3 past = player.companion$getJumpPos();
@@ -45,8 +44,8 @@ public class EntityMixin {
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "canChangeDimensions", cancellable = true)
-	private void companion_canChangeDimensions(CallbackInfoReturnable<Boolean> ci) {
+	@Inject(at = @At("HEAD"), method = "canTeleport", cancellable = true)
+	private void companion_canChangeDimensions(Level from, Level to, CallbackInfoReturnable<Boolean> ci) {
 		if (Hooks.traveling) {
 			return;
 		}
@@ -75,21 +74,10 @@ public class EntityMixin {
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
-	private void companion_isInvulnerableTo(DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
-		Entity self = (Entity) (Object) this;
-		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null &&
-				Hooks.getEntityOwner(self) == damageSource.getEntity()) {
-			if (!self.level().getGameRules().getBoolean(Companion.PET_FRIENDLY_FIRE)) {
-				ci.setReturnValue(true);
-			}
-		}
-	}
-
 	@SuppressWarnings("ConstantValue")
 	@Inject(at = @At("HEAD"), method = "isInvulnerable", cancellable = true)
 	private void companion_isInvulnerable(CallbackInfoReturnable<Boolean> cir) {
-		if ((Object) this instanceof LivingEntity self && Hooks.isImmortalDying(self)) {
+		if ((Object) this instanceof LivingEntity self && self.level() instanceof ServerLevel level && Hooks.isImmortalDying(level, self)) {
 			cir.setReturnValue(true);
 		}
 	}
