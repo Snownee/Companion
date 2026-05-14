@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lizin5ths.indypets.util.IndyPetsUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -297,9 +298,9 @@ public class Hooks {
 				return false;
 			}
 			if (indyPets) {
-//				if (IndyPetsUtil.isIndependent(animal)) {
-//					return false;
-//				}
+				if (IndyPetsUtil.isIndependent(animal)) {
+					return false;
+				}
 			}
 		}
 		if (pet instanceof AbstractHorse) {
