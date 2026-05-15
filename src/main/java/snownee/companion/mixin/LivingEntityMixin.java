@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
+import snownee.companion.CompanionPlayer;
 import snownee.companion.CompanionTamableAnimal;
 import snownee.companion.Hooks;
 
@@ -24,18 +26,17 @@ import snownee.companion.Hooks;
 public class LivingEntityMixin {
 
 	@SuppressWarnings("ConstantValue")
-	@Inject(at = @At("TAIL"), method = "hurt")
-	private void companion_hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
+	@Inject(at = @At("TAIL"), method = "hurtServer")
+	private void companion_hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
 		if (CompanionCommonConfig.petTeleportToOwnerWhenInjured && !damageSource.is(DamageTypes.FELL_OUT_OF_WORLD) &&
 				(Object) this instanceof TamableAnimal) {
-			((CompanionTamableAnimal) this).companion$tryTeleportToOwner(damageSource);
+			((CompanionTamableAnimal) this).companion$tryTeleportToOwner(level, damageSource);
 		}
 	}
 
 	@WrapOperation(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
 	private void companion_setHealth(LivingEntity entity, float health, Operation<Void> original) {
-		if (health < 1 && !entity.isDeadOrDying() && entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS) &&
-				Hooks.getEntityOwner(entity) != null) {
+		if (entity.level() instanceof ServerLevel level && Hooks.isImmortalDying(level, entity)) {
 			health = 1;
 		}
 		original.call(entity, health);
@@ -44,9 +45,24 @@ public class LivingEntityMixin {
 	@Inject(method = "baseTick", at = @At("HEAD"))
 	private void companion_baseTick(CallbackInfo ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
-		if (self.tickCount % 20 == 0 && Hooks.isImmortalDying(self)) {
-			self.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1));
+		if (self.tickCount % 20 == 0 && self.level() instanceof ServerLevel level && Hooks.isImmortalDying(level, self)) {
+			self.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 40, 1));
 		}
 	}
 
+	@Inject(method = "jumpFromGround", at = @At("HEAD"))
+	private void companion_jumpFromGround(CallbackInfo ci) {
+		if (this instanceof CompanionPlayer player) {
+			player.companion$setJumpPos(((LivingEntity) (Object) this).position());
+		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
+	private void companion_isInvulnerableTo(ServerLevel level, DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
+		LivingEntity self = (LivingEntity) (Object) this;
+		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null &&
+				Hooks.getEntityOwner(self) == damageSource.getEntity() && !level.getGameRules().get(Companion.PET_FRIENDLY_FIRE)) {
+			ci.setReturnValue(true);
+		}
+	}
 }

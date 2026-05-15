@@ -33,8 +33,8 @@
 	"companion.config.shoulderPets.dismountWhileFlying.desc": "Vanilla é verdadeiro",
 	"companion.config.shoulderPets.smartDismount": "Desmontagem Inteligente",
 	"companion.config.shoulderPets.smartDismount.desc": "Pule no lugar para desmontar animais de estimação",
-	"gamerule.companion:alwaysTeleportHorses": "Sempre teletransportar o cavalo",
-	"gamerule.companion:alwaysTeleportHorses.description": "Sempre teletransportar seus cavalos se eles estiverem muito longe de você. (pelo mod Companion)",
-	"gamerule.companion:petFriendlyFire": "Fogo amigo dos animais de estimação",
-	"gamerule.companion:petFriendlyFire.description": "Fogo amigável para animais de estimação. (pelo mod Companion)"
+	"gamerule.companion.always_teleport_horses": "Sempre teletransportar o cavalo",
+	"gamerule.companion.always_teleport_horses.description": "Sempre teletransportar seus cavalos se eles estiverem muito longe de você. (pelo mod Companion)",
+	"gamerule.companion.pet_friendly_fire": "Fogo amigo dos animais de estimação",
+	"gamerule.companion.pet_friendly_fire.description": "Fogo amigável para animais de estimação. (pelo mod Companion)"
 }

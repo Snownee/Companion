@@ -3,6 +3,7 @@ package snownee.companion.mixin;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -14,6 +15,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	}
 
 	@Override
+	@Nullable
 	public String getRefMapperConfig() {
 		return null;
 	}
@@ -28,6 +30,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 	}
 
 	@Override
+	@Nullable
 	public List<String> getMixins() {
 		return null;
 	}

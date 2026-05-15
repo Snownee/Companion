@@ -2,31 +2,32 @@ package snownee.companion;
 
 import java.util.concurrent.CompletableFuture;
 
-import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import snownee.kiwi.datagen.KiwiLanguageProvider;
 
-public class CompanionDataGen implements DataGeneratorEntrypoint {
-	@Override
-	public void onInitializeDataGenerator(FabricDataGenerator fabricDataGenerator) {
-		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
-		pack.addProvider(KiwiLanguageProvider::new);
-		pack.addProvider(ItemTags::new);
+public final class CompanionDataGen {
+	private CompanionDataGen() {
 	}
 
-	public static class ItemTags extends FabricTagProvider.ItemTagProvider {
-		public ItemTags(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
-			super(output, completableFuture);
+	public static void gatherData(GatherDataEvent.Client event) {
+		event.createProvider((output, lookupProvider) -> new KiwiLanguageProvider(output, Companion.ID, lookupProvider));
+		event.createProvider(ItemTags::new);
+	}
+
+	public static class ItemTags extends ItemTagsProvider {
+
+		public ItemTags(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+			super(output, lookupProvider, Companion.ID);
 		}
 
 		@Override
 		protected void addTags(HolderLookup.Provider provider) {
-			tag(Hooks.CHARGED_RANGED_WEAPONS).add(Items.TRIDENT).forceAddTag(ConventionalItemTags.CROSSBOW_TOOLS);
+			tag(Companion.CHARGED_RANGED_WEAPONS).add(Items.TRIDENT).addTag(Tags.Items.TOOLS_CROSSBOW);
 		}
 	}
 }
