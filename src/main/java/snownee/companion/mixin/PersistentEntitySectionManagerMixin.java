@@ -37,13 +37,16 @@ public abstract class PersistentEntitySectionManagerMixin {
 			), method = "tick"
 	)
 	private void companion_tick(CallbackInfo ci) {
-		chunksToUnload.forEach(l -> {
+		for (long l : chunksToUnload.toLongArray()) {
+			if (!chunksToUnload.contains(l)) {
+				continue;
+			}
 			if (this.chunkVisibility.get(l) != Visibility.HIDDEN || !areEntitiesLoaded(l)) {
-				return;
+				continue;
 			}
 			List<EntityAccess> entities = sectionStorage.getExistingSectionsInChunk(l).flatMap(EntitySection::getEntities).toList();
 			Hooks.handleChunkPreUnload(entities);
-		});
+		}
 	}
 
 	@Shadow
