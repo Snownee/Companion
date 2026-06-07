@@ -25,6 +25,7 @@ public class TargetGoalMixin {
 
 	@Inject(at = @At("HEAD"), method = "canContinueToUse", cancellable = true)
 	private void companion_canContinueToUse(CallbackInfoReturnable<Boolean> ci) {
+		//noinspection ConstantValue
 		if (targetMob != null && mob instanceof TamableAnimal pet && !Hooks.wantsToAttack((ServerLevel) pet.level(), pet, targetMob)) {
 			ci.setReturnValue(false);
 		}

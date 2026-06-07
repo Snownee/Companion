@@ -56,12 +56,12 @@ public abstract class TamableAnimalMixin extends Animal implements CompanionTama
 	}
 
 	@WrapMethod(method = "teleportToAroundBlockPos")
-	private void companion_teleportToAroundBlockPos(BlockPos pos, Operation<Void> original) {
+	private void companion_teleportToAroundBlockPos(BlockPos targetPos, Operation<Void> original) {
 		if (!CompanionCommonConfig.petForceTeleportingIfFollowFailed) {
-			original.call(pos);
+			original.call(targetPos);
 			return;
 		}
-		Hooks.teleportWithRandomOffset(this, level(), pos, null, getOwner())
+		Hooks.teleportWithRandomOffset(this, level(), targetPos, null, getOwner())
 				.ifPresent(vec -> teleportTo(vec.x, vec.y, vec.z));
 	}
 

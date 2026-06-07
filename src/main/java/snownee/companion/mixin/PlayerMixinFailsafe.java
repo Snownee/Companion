@@ -7,10 +7,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
 import net.minecraft.world.entity.player.Player;
-import snownee.companion.CompanionPlayer;
 
 @Mixin(value = Player.class, priority = 950)
-public abstract class PlayerMixinFailsafe implements CompanionPlayer {
+public abstract class PlayerMixinFailsafe {
 
 	@WrapOperation(
 			at = @At(

@@ -22,38 +22,9 @@ import snownee.companion.Hooks;
 @Mixin(value = Player.class, priority = 1050)
 public abstract class PlayerMixin implements CompanionPlayer {
 
-	@Inject(at = @At("TAIL"), method = "aiStep")
-	private void companion_aiStep(CallbackInfo ci) {
-		Player player = (Player) (Object) this;
-		if (player.level().isClientSide()) {
-			return;
-		}
-		if (player.isSleeping() || player.isInPowderSnow) {
-			removeEntitiesOnShoulder();
-			return;
-		}
-		if (CompanionCommonConfig.shoulderDismountInWater && player.isInWater()) {
-			removeEntitiesOnShoulder();
-			return;
-		}
-		if (CompanionCommonConfig.shoulderDismountUnderWater && player.isUnderWater()) {
-			removeEntitiesOnShoulder();
-			return;
-		}
-		if (player.fallDistance > CompanionCommonConfig.shoulderDismountFallDistance) {
-			removeEntitiesOnShoulder();
-			return;
-		}
-		if (CompanionCommonConfig.shoulderDismountWhileFlying && player.getAbilities().flying) {
-			removeEntitiesOnShoulder();
-			return;
-		}
-		//TODO under lava???
-	}
-
 	@Inject(at = @At("TAIL"), method = "hurtServer")
-	private void companion_hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
-		if (f > CompanionCommonConfig.shoulderDismountDamageThreshold) {
+	private void companion_hurt(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<Boolean> ci) {
+		if (damage > CompanionCommonConfig.shoulderDismountDamageThreshold) {
 			removeEntitiesOnShoulder();
 		}
 	}

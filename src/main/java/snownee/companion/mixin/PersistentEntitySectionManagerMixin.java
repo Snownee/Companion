@@ -29,7 +29,7 @@ public abstract class PersistentEntitySectionManagerMixin {
 	private Long2ObjectMap<Visibility> chunkVisibility;
 	@Final
 	@Shadow
-	EntitySectionStorage<EntityAccess> sectionStorage;
+	private EntitySectionStorage<EntityAccess> sectionStorage;
 
 	@Inject(
 			at = @At(
