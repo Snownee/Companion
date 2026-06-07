@@ -27,10 +27,10 @@ public class LivingEntityMixin {
 
 	@SuppressWarnings("ConstantValue")
 	@Inject(at = @At("TAIL"), method = "hurtServer")
-	private void companion_hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> ci) {
-		if (CompanionCommonConfig.petTeleportToOwnerWhenInjured && !damageSource.is(DamageTypes.FELL_OUT_OF_WORLD) &&
+	private void companion_hurt(ServerLevel level, DamageSource source, float damage, CallbackInfoReturnable<Boolean> ci) {
+		if (CompanionCommonConfig.petTeleportToOwnerWhenInjured && !source.is(DamageTypes.FELL_OUT_OF_WORLD) &&
 				(Object) this instanceof TamableAnimal) {
-			((CompanionTamableAnimal) this).companion$tryTeleportToOwner(level, damageSource);
+			((CompanionTamableAnimal) this).companion$tryTeleportToOwner(level, source);
 		}
 	}
 
@@ -58,10 +58,10 @@ public class LivingEntityMixin {
 	}
 
 	@Inject(at = @At("HEAD"), method = "isInvulnerableTo", cancellable = true)
-	private void companion_isInvulnerableTo(ServerLevel level, DamageSource damageSource, CallbackInfoReturnable<Boolean> ci) {
+	private void companion_isInvulnerableTo(ServerLevel level, DamageSource source, CallbackInfoReturnable<Boolean> ci) {
 		LivingEntity self = (LivingEntity) (Object) this;
-		if (!damageSource.is(DamageTypes.PLAYER_EXPLOSION) && damageSource.getEntity() != null &&
-				Hooks.getEntityOwner(self) == damageSource.getEntity() && !level.getGameRules().get(Companion.PET_FRIENDLY_FIRE)) {
+		if (!source.is(DamageTypes.PLAYER_EXPLOSION) && source.getEntity() != null &&
+				Hooks.getEntityOwner(self) == source.getEntity() && !level.getGameRules().get(Companion.PET_FRIENDLY_FIRE)) {
 			ci.setReturnValue(true);
 		}
 	}

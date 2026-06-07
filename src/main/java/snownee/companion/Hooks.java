@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lizin5ths.indypets.util.IndyPetsUtil;
 
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
@@ -230,9 +231,10 @@ public class Hooks {
 		}
 		BlockPos blockPos2 = blockPos.subtract(entity.blockPosition());
 		AABB moved = entity.getBoundingBox().move(blockPos2.getX() + .5, blockPos2.getY(), blockPos2.getZ() + .5);
-		return !moved.intersects(avoidColliding) && level.noCollision(entity, moved);
+		return (avoidColliding == null || !moved.intersects(avoidColliding)) && level.noCollision(entity, moved);
 	}
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean wantsToAttack(ServerLevel level, TamableAnimal pet, @Nullable LivingEntity enemy) {
 		if (!pet.isTame()) {
 			return true;
@@ -297,9 +299,9 @@ public class Hooks {
 				return false;
 			}
 			if (indyPets) {
-//				if (IndyPetsUtil.isIndependent(animal)) {
-//					return false;
-//				}
+				if (IndyPetsUtil.isIndependent(animal)) {
+					return false;
+				}
 			}
 		}
 		if (pet instanceof AbstractHorse) {

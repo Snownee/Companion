@@ -1,0 +1,4 @@
+clientOnly: false
+configs:
+- data: {}
+  target: snownee.companion.CompanionCommonConfig

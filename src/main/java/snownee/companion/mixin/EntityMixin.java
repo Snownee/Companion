@@ -26,9 +26,9 @@ import snownee.companion.Hooks;
 public class EntityMixin {
 
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
-	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
+	private void companion_checkFallDamage(double ya, boolean onGround, BlockState onState, BlockPos pos, CallbackInfo ci) {
 		Entity entity = (Entity) (Object) this;
-		if (bl && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide() && entity.fallDistance > 0 &&
+		if (onGround && CompanionCommonConfig.shoulderDismountSmartMode && !entity.level().isClientSide() && entity.fallDistance > 0 &&
 				entity instanceof Player) {
 			CompanionPlayer player = (CompanionPlayer) this;
 			Vec3 past = player.companion$getJumpPos();
@@ -37,7 +37,6 @@ public class EntityMixin {
 			}
 			Vec3 now = entity.position();
 			player.companion$setJumpPos(null);
-			//noinspection SuspiciousNameCombination
 			if (Mth.equal(past.x, now.x) && Mth.equal(past.y, now.y) && Mth.equal(past.z, now.z)) {
 				player.companion$removeShoulderEntities();
 			}
@@ -65,9 +64,9 @@ public class EntityMixin {
 
 	@SuppressWarnings("ConstantValue")
 	@Inject(at = @At("HEAD"), method = "isAlliedTo(Lnet/minecraft/world/entity/Entity;)Z", cancellable = true)
-	private void companion_isAlliedTo(Entity entity, CallbackInfoReturnable<Boolean> ci) {
+	private void companion_isAlliedTo(Entity other, CallbackInfoReturnable<Boolean> ci) {
 		if (CompanionCommonConfig.betterSweepingEdgeEffect && (Object) this instanceof Player player) {
-			Player owner = Hooks.getEntityOwner(entity);
+			Player owner = Hooks.getEntityOwner(other);
 			if (Objects.equals(player, owner)) {
 				ci.setReturnValue(true);
 			}
