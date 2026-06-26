@@ -7,6 +7,8 @@
   "companion.config.follow.logIfTeleportingFailed.desc": "Log to console if a pet failed to teleport when the chunk was unloaded",
   "companion.config.follow.petForceTeleportingIfFollowFailed": "Pet Force Teleporting If Follow Failed",
   "companion.config.follow.petForceTeleportingIfFollowFailed.desc": "",
+  "companion.config.follow.petForceTeleportingWhenChunkUnload": "Pet Force Teleporting When Chunk Unload",
+  "companion.config.follow.petForceTeleportingWhenChunkUnload.desc": "",
   "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Player Nearby Change Dimension Radius",
   "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "Pet Won't Change Dimension Unless Owner Is Nearby",
   "companion.config.follow.portalMaxTeleportedPets": "Portal Max Teleported Pets",
