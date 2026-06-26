@@ -16,6 +16,7 @@ import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.entity.Visibility;
+import snownee.companion.CompanionCommonConfig;
 import snownee.companion.Hooks;
 
 @Mixin(PersistentEntitySectionManager.class)
@@ -33,10 +34,12 @@ public abstract class PersistentEntitySectionManagerMixin {
 
 	@Inject(
 			at = @At(
-					value = "INVOKE", target = "Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;processUnloads()V"
-			), method = "tick"
-	)
+					value = "INVOKE", target = "Lnet/minecraft/world/level/entity/PersistentEntitySectionManager;processUnloads()V"),
+			method = "tick")
 	private void companion_tick(CallbackInfo ci) {
+		if (!CompanionCommonConfig.petForceTeleportingWhenChunkUnload) {
+			return;
+		}
 		for (long l : chunksToUnload.toLongArray()) {
 			if (!chunksToUnload.contains(l)) {
 				continue;
