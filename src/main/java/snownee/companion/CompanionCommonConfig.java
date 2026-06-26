@@ -25,6 +25,8 @@ public final class CompanionCommonConfig {
 	public static int portalMaxTeleportedPets = -1;
 	@Path("follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius")
 	public static float petWontChangeDimensionUnlessOwnerIsNearbyRadius = 3;
+	@Path("follow.petForceTeleportingWhenChunkUnload")
+	public static boolean petForceTeleportingWhenChunkUnload = true;
 	@Path("follow.petForceTeleportingIfFollowFailed")
 	public static boolean petForceTeleportingIfFollowFailed = true;
 	@Path("follow.logIfTeleportingFailed")
