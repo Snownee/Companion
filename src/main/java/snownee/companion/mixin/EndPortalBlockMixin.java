@@ -30,7 +30,7 @@ public class EndPortalBlockMixin {
 			CallbackInfo ci) {
 		if (CompanionCommonConfig.portalTeleportingPets && level instanceof ServerLevel serverLevel &&
 				entity instanceof ServerPlayer player) {
-			Hooks.changeDimension(player, serverLevel.getServer().overworld(), serverLevel, true);
+			Hooks.onTeleport(player, serverLevel.getServer().overworld(), serverLevel, Hooks.TeleportType.ReturnFromEnd);
 		}
 	}
 
