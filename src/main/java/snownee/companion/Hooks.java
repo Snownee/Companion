@@ -56,27 +56,47 @@ public class Hooks {
 	public static boolean traveling;
 	public static boolean indyPets = Platform.isModLoaded("indypets");
 
-	// Here is a bug that tamed wolf reset their health when it travels through portal.
-	// Good job mojang
-	public static void changeDimension(ServerPlayer player, ServerLevel to, ServerLevel from, boolean returnFromEnd) {
-		if (player.isSpectator() || player.isDeadOrDying()) {
-			return;
-		}
-		if (returnFromEnd) {
+	public static void onTeleport(ServerPlayer player, ServerLevel to, ServerLevel from, TeleportType teleportType) {
+		if (teleportType == TeleportType.ReturnFromEnd) {
 			if (player.level() != from) {
 				return;
 			}
-		} else {
+		} else if (teleportType == TeleportType.NormalCrossDimension) {
 			if (player.level() != to) {
+				return;
+			}
+		} else if (teleportType == TeleportType.Respawn) {
+			if (!CompanionCommonConfig.playerRespawnTeleportingPets) {
 				return;
 			}
 		}
 
+		if (player.isSpectator() || player.isDeadOrDying()) {
+			return;
+		}
+
+		BlockPos playerPos;
+		if (teleportType == TeleportType.Respawn) {
+			TeleportTransition transition = player.findRespawnPositionAndUseSpawnBlock(false, TeleportTransition.DO_NOTHING);
+			playerPos = BlockPos.containing(transition.position());
+			to = transition.newLevel();
+		} else {
+			playerPos = player.blockPosition();
+		}
 		for (Entity entity : getAllPets(from, to, player)) {
 			if (entity instanceof Mob mob) {
+				if (mob.level() == to && mob.distanceToSqr(playerPos.getX() + 0.5, playerPos.getY() + 0.5, playerPos.getZ() + 0.5) < 256) {
+					continue;
+				}
 				entity.setPortalCooldown();
-				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, player.blockPosition(), false, player).orElseGet(player::position);
-				entity.teleport(new TeleportTransition(to, dest, Vec3.ZERO, 0.0F, 0.0F, TeleportTransition.DO_NOTHING));
+				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, playerPos, false, player).orElseGet(player::position);
+				entity.teleport(new TeleportTransition(
+						to,
+						dest,
+						Vec3.ZERO,
+						entity.getYRot(),
+						entity.getXRot(),
+						TeleportTransition.DO_NOTHING));
 			}
 		}
 	}
@@ -232,10 +252,8 @@ public class Hooks {
 	}
 
 	public static boolean isImmortalDying(ServerLevel level, LivingEntity entity) {
-		return !entity.isDeadOrDying() && entity.getHealth() <= 1
-				&& level.getGameRules().get(Companion.IMMORTAL_PETS)
-				&& !entity.is(Companion.IMMORTAL_BLACKLIST)
-				&& Hooks.getEntityOwner(entity) != null;
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && level.getGameRules().get(Companion.IMMORTAL_PETS) && !entity.is(
+				Companion.IMMORTAL_BLACKLIST) && Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {
@@ -356,5 +374,9 @@ public class Hooks {
 
 	public static void teleportCrossDimension(Entity entity, ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition transition) {
 //		Companion.LOGGER.info("teleportCrossDimension: {} -> {}", entity, transition);
+	}
+
+	public enum TeleportType {
+		NormalCrossDimension, ReturnFromEnd, Respawn
 	}
 }
