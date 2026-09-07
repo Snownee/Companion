@@ -17,6 +17,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 import snownee.companion.CompanionCommonConfig;
 import snownee.companion.CompanionPlayer;
@@ -79,6 +80,15 @@ public class EntityMixin {
 		if ((Object) this instanceof LivingEntity self && self.level() instanceof ServerLevel level && Hooks.isImmortalDying(level, self)) {
 			cir.setReturnValue(true);
 		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "teleportCrossDimension")
+	private void companion_teleportCrossDimension(
+			ServerLevel oldLevel,
+			ServerLevel newLevel,
+			TeleportTransition transition,
+			CallbackInfoReturnable<Entity> cir) {
+		Hooks.teleportCrossDimension((Entity) (Object) this, oldLevel, newLevel, transition);
 	}
 
 }
