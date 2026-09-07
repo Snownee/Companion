@@ -38,8 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -75,23 +73,8 @@ public class Hooks {
 				return;
 			}
 		}
-		boolean nether = from.dimension() == Level.NETHER || to.dimension() == Level.NETHER;
-		BlockPos portalPos = null;
-		if (nether) {
-			if (player.portalProcess != null) {
-				portalPos = player.portalProcess.getEntryPosition();
-			}
-
-			if (portalPos == null) {
-				return;
-			}
-		}
 
 		for (Entity entity : getAllPets(from, to, player)) {
-			if (nether) {
-				entity.setPortalCooldown(0);
-				entity.setAsInsidePortal((NetherPortalBlock) Blocks.NETHER_PORTAL, portalPos);
-			}
 			if (entity instanceof Mob mob) {
 				entity.setPortalCooldown();
 				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, player.blockPosition(), false, player).orElseGet(player::position);
@@ -372,5 +355,9 @@ public class Hooks {
 		if (mob.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
 			mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
 		}
+	}
+
+	public static void teleportCrossDimension(Entity entity, ServerLevel oldLevel, ServerLevel newLevel, TeleportTransition transition) {
+//		Companion.LOGGER.info("teleportCrossDimension: {} -> {}", entity, transition);
 	}
 }
