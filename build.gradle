@@ -54,7 +54,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven {
-        url "https://maven.su5ed.dev/releases"
+        url "https://maven.sinytra.org"
     }
     maven { url "https://maven.shedaniel.me/" }
     maven { url "https://maven.terraformersmc.com/releases/" }
@@ -74,7 +74,7 @@ dependencies {
     api("me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_config_version}")
 
     // https://modrinth.com/mod/kiwi/versions
-    implementation(annotationProcessor("maven.modrinth:kiwi:15.5.0+neoforge"))
+    implementation(annotationProcessor("maven.modrinth:kiwi:15.8.7+neoforge"))
     // https://modrinth.com/mod/jade/versions
     implementation "maven.modrinth:jade:15.10.0+neoforge"
 

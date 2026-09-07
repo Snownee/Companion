@@ -22,7 +22,7 @@ public class EndPortalBlockMixin {
 	private void companion_entityInside(BlockState blockState, Level level, BlockPos blockPos, Entity entity, CallbackInfo ci) {
 		if (CompanionCommonConfig.portalTeleportingPets && level instanceof ServerLevel serverLevel &&
 				entity instanceof ServerPlayer player) {
-			Hooks.changeDimension(player, player.server.overworld(), serverLevel, true);
+			Hooks.onTeleport(player, serverLevel.getServer().overworld(), serverLevel, Hooks.TeleportType.ReturnFromEnd);
 		}
 	}
 
