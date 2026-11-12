@@ -38,8 +38,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.pathfinder.PathType;
@@ -60,8 +58,6 @@ public class Hooks {
 	public static boolean traveling;
 	public static boolean indyPets = Platform.isModLoaded("indypets");
 
-	// Here is a bug that tamed wolf reset their health when it travels through portal.
-	// Good job mojang
 	public static void changeDimension(ServerPlayer player, ServerLevel to, ServerLevel from, boolean returnFromEnd) {
 		if (player.isSpectator() || player.isDeadOrDying()) {
 			return;
@@ -75,23 +71,7 @@ public class Hooks {
 				return;
 			}
 		}
-		boolean nether = from.dimension() == Level.NETHER || to.dimension() == Level.NETHER;
-		BlockPos portalPos = null;
-		if (nether) {
-			if (player.portalProcess != null) {
-				portalPos = player.portalProcess.getEntryPosition();
-			}
-
-			if (portalPos == null) {
-				return;
-			}
-		}
-
 		for (Entity entity : getAllPets(from, to, player)) {
-			if (nether) {
-				entity.setPortalCooldown(0);
-				entity.setAsInsidePortal((NetherPortalBlock) Blocks.NETHER_PORTAL, portalPos);
-			}
 			if (entity instanceof Mob mob) {
 				entity.setPortalCooldown();
 				Vec3 dest = Hooks.teleportWithRandomOffset(mob, to, player.blockPosition(), false, player).orElseGet(player::position);
@@ -372,5 +352,9 @@ public class Hooks {
 		if (mob.getBrain().hasMemoryValue(MemoryModuleType.ATTACK_TARGET)) {
 			mob.getBrain().eraseMemory(MemoryModuleType.ATTACK_TARGET);
 		}
+	}
+
+	public static void teleportCrossDimension(Entity entity, Level oldLevel, ServerLevel newLevel, DimensionTransition transition) {
+//		Companion.LOGGER.info("teleportCrossDimension: {} -> {}", entity, transition);
 	}
 }

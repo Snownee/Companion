@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,7 +17,9 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import snownee.companion.Companion;
 import snownee.companion.CompanionCommonConfig;
@@ -24,7 +27,10 @@ import snownee.companion.CompanionPlayer;
 import snownee.companion.Hooks;
 
 @Mixin(Entity.class)
-public class EntityMixin {
+public abstract class EntityMixin {
+
+	@Shadow
+	public abstract Level level();
 
 	@Inject(at = @At("HEAD"), method = "checkFallDamage")
 	private void companion_checkFallDamage(double d, boolean bl, BlockState blockState, BlockPos blockPos, CallbackInfo ci) {
@@ -92,6 +98,13 @@ public class EntityMixin {
 		if ((Object) this instanceof LivingEntity self && Hooks.isImmortalDying(self)) {
 			cir.setReturnValue(true);
 		}
+	}
+
+	@Inject(at = @At("HEAD"), method = "changeDimension")
+	private void companion_changeDimension(
+			DimensionTransition transition,
+			CallbackInfoReturnable<Entity> cir) {
+		Hooks.teleportCrossDimension((Entity) (Object) this, level(), transition.newLevel(), transition);
 	}
 
 }
