@@ -12,6 +12,7 @@
 		"MobAccess",
 		"MobMixin",
 		"PersistentEntitySectionManagerMixin",
+		"PlayerListMixin",
 		"PlayerMixin",
 		"PlayerMixinFailsafe",
 		"ServerPlayerMixin",

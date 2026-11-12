@@ -11,6 +11,8 @@
   "companion.config.follow.petForceTeleportingWhenChunkUnload.desc": "",
   "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius": "Player Nearby Change Dimension Radius",
   "companion.config.follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius.desc": "Pet Won't Change Dimension Unless Owner Is Nearby",
+  "companion.config.follow.playerRespawnTeleportingPets": "Player Respawn Teleporting Pets",
+  "companion.config.follow.playerRespawnTeleportingPets.desc": "",
   "companion.config.follow.portalMaxTeleportedPets": "Portal Max Teleported Pets",
   "companion.config.follow.portalMaxTeleportedPets.desc": "Max number of animals that will be teleported with you\n-1 = Use the value of maxEntityCramming gamerule",
   "companion.config.follow.portalTeleportingPets": "Portal Teleporting Pets",

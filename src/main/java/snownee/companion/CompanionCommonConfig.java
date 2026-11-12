@@ -21,6 +21,8 @@ public final class CompanionCommonConfig {
 
 	@Path("follow.portalTeleportingPets")
 	public static boolean portalTeleportingPets = true;
+	@Path("follow.playerRespawnTeleportingPets")
+	public static boolean playerRespawnTeleportingPets = true;
 	@Path("follow.portalMaxTeleportedPets")
 	public static int portalMaxTeleportedPets = -1;
 	@Path("follow.petWontChangeDimensionUnlessOwnerIsNearbyRadius")
