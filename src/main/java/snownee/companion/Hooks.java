@@ -253,8 +253,11 @@ public class Hooks {
 	}
 
 	public static boolean isImmortalDying(LivingEntity entity) {
-		return !entity.isDeadOrDying() && entity.getHealth() <= 1
-				&& entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS)
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && isImmortal(entity);
+	}
+
+	public static boolean isImmortal(LivingEntity entity) {
+		return entity.level().getGameRules().getBoolean(Companion.IMMORTAL_PETS)
 				&& !entity.getType().is(Companion.IMMORTAL_BLACKLIST)
 				&& Hooks.getEntityOwner(entity) != null;
 	}
