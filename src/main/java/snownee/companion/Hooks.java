@@ -252,8 +252,12 @@ public class Hooks {
 	}
 
 	public static boolean isImmortalDying(ServerLevel level, LivingEntity entity) {
-		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && level.getGameRules().get(Companion.IMMORTAL_PETS) && !entity.is(
-				Companion.IMMORTAL_BLACKLIST) && Hooks.getEntityOwner(entity) != null;
+		return !entity.isDeadOrDying() && entity.getHealth() <= 1 && isImmortal(level, entity);
+	}
+
+	public static boolean isImmortal(ServerLevel level, LivingEntity entity) {
+		return level.getGameRules().get(Companion.IMMORTAL_PETS) && !entity.is(Companion.IMMORTAL_BLACKLIST)
+				&& Hooks.getEntityOwner(entity) != null;
 	}
 
 	public static boolean isInjured(LivingEntity entity) {

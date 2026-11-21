@@ -36,7 +36,8 @@ public class LivingEntityMixin {
 
 	@WrapOperation(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setHealth(F)V"))
 	private void companion_setHealth(LivingEntity entity, float health, Operation<Void> original) {
-		if (entity.level() instanceof ServerLevel level && Hooks.isImmortalDying(level, entity)) {
+		// The entity's health is still the pre-hit value here, so decide based on the incoming health instead of isImmortalDying
+		if (health < 1 && !entity.isDeadOrDying() && entity.level() instanceof ServerLevel level && Hooks.isImmortal(level, entity)) {
 			health = 1;
 		}
 		original.call(entity, health);
